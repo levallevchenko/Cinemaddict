@@ -1,4 +1,4 @@
-import {render, RenderPosition, remove} from "./utils/render.js";
+import {render, RenderPosition} from "./utils/render.js";
 import {escPressHandler} from "./utils/project.js";
 import {FILM_COUNT} from "./view/film-count.js";
 import UserRatingView from "./view/user-rating.js";

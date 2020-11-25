@@ -1,6 +1,10 @@
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import {getRandomInteger, getRandomNumber, getElementFromArray, generateSentenceFromString, generateRandomArray, generateRandomDate} from "../utils/common.js";
 import {getFormatTime} from "../utils/project.js";
 import {EMOJIS} from "../const.js";
+
+dayjs.extend(relativeTime);
 
 const NAMES_MIN_COUNT = 2;
 const NAMES_MAX_COUNT = 4;
@@ -20,7 +24,7 @@ const FILM_MAX_DURATION = 14400;
 const COMMENTS_MIN_COUNT = 1;
 const COMMENTS_MAX_COUNT = 5;
 
-const DATE_OF_FIRST_COMMENT = `2010, 2, 1`;
+const DATE_OF_FIRST_COMMENT = `2020, 2, 1`;
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
@@ -101,12 +105,12 @@ const ageLimits = [`0+`, `6+`, `12+`, `14+`, `16+`, `18+`];
 
 
 const date = generateRandomDate(new Date(DATE_OF_FIRST_COMMENT), new Date());
-const minuteFormat = (date.getMinutes() < 10 ? `0` : ``) + date.getMinutes();
+const dateTime = dayjs(date);
 
 const filmComment = {
   emoji: getElementFromArray(EMOJIS),
   comment: generateSentenceFromString(descriptionString),
-  commentDate: `${date.getFullYear()}/${date.getMonth()}/${date.getDate()} ${date.getHours()}:${minuteFormat}`,
+  commentDate: dateTime.fromNow(),
   author: getElementFromArray(names),
 };
 
@@ -142,7 +146,6 @@ export const generateFilm = () => {
   const ageLimit = getElementFromArray(ageLimits);
 
   const comments = new Array(getRandomInteger(COMMENT_MIN_COUNT, COMMENT_MAX_COUNT)).fill().map(generateFilmComment);
-
 
   return {
     id,
