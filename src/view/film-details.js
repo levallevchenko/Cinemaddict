@@ -7,11 +7,9 @@ const createGenresTemplate = (genre) => {
 };
 
 const createFilmDetailsTemplate = (film) => {
-  const {filmPoster, filmTitle, rating, filmDuration, genres, description, filmOriginTitle, director, writers, actors, country, ageLimit, isWatchlist, isWatched, isFavorite, date} = film;
+  const {filmPoster, filmTitle, rating, filmDuration, genres, description, filmOriginTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite} = film;
 
   const filmGenresTemplate = generateTemplate(genres, createGenresTemplate);
-
-  const releaseDate = date.toLocaleString(`en-GB`, {year: `numeric`, month: `long`, day: `numeric`});
 
   const checkedClass = `checked`;
 

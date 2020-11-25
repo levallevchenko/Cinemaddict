@@ -16,8 +16,7 @@ const COMMENT_MAX_COUNT = 5;
 const RATING_MIN_VALUE = 1;
 const RATING_MAX_VALUE = 10;
 
-const FILM_CREATE_MIN_YEAR = 1900;
-const FILM_CREATE_MAX_YEAR = 2020;
+const FILM_CREATE_MIN_DATE = `1900, 2, 1`;
 const FILM_MIN_DURATION = 1200;
 const FILM_MAX_DURATION = 14400;
 
@@ -103,16 +102,13 @@ const names = [
 const countries = [`Canada`, `China`, `UK`, `Russia`, `Australia`, `USA`];
 const ageLimits = [`0+`, `6+`, `12+`, `14+`, `16+`, `18+`];
 
-
-const date = generateRandomDate(new Date(DATE_OF_FIRST_COMMENT), new Date());
-const dateTime = dayjs(date);
-
 const generateFilmComment = () => {
+  const commentDate = generateRandomDate(new Date(DATE_OF_FIRST_COMMENT), new Date());
 
   return {
     emoji: getElementFromArray(EMOJIS),
     comment: generateSentenceFromString(descriptionString),
-    commentDate: dateTime.fromNow(),
+    commentDate: commentDate.fromNow(),
     author: getElementFromArray(names),
  }
 };
@@ -123,7 +119,10 @@ export const generateFilm = () => {
   const filmPoster = getElementFromArray(filmPosters);
   const description = generateRandomArray(descriptionArray, 1, 5);
   const rating = getRandomNumber(RATING_MIN_VALUE, RATING_MAX_VALUE).toFixed(1);
-  const filmCreateYear = getRandomInteger(FILM_CREATE_MIN_YEAR, FILM_CREATE_MAX_YEAR);
+
+  const filmReleaseDate = generateRandomDate(new Date(FILM_CREATE_MIN_DATE), new Date());
+  const releaseDate = filmReleaseDate.format(`DD MMMM YYYY`);
+  const releaseYear = filmReleaseDate.format(`YYYY`);
 
   const filmDurationInSecond = getRandomInteger(FILM_MIN_DURATION, FILM_MAX_DURATION);
   const filmDuration = getFormatTime(filmDurationInSecond);
@@ -145,7 +144,7 @@ export const generateFilm = () => {
     filmPoster,
     description,
     rating,
-    filmCreateYear,
+    releaseYear,
     filmDuration,
     genres,
     commentsCount,
@@ -154,7 +153,7 @@ export const generateFilm = () => {
     director,
     writers,
     actors,
-    date,
+    releaseDate,
     country,
     ageLimit,
     isWatchlist: Boolean(getRandomInteger(0, 1)),
