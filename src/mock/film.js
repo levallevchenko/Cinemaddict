@@ -107,22 +107,14 @@ const ageLimits = [`0+`, `6+`, `12+`, `14+`, `16+`, `18+`];
 const date = generateRandomDate(new Date(DATE_OF_FIRST_COMMENT), new Date());
 const dateTime = dayjs(date);
 
-const filmComment = {
-  emoji: getElementFromArray(EMOJIS),
-  comment: generateSentenceFromString(descriptionString),
-  commentDate: dateTime.fromNow(),
-  author: getElementFromArray(names),
-};
-
 const generateFilmComment = () => {
-  const {emoji, comment, commentDate, author} = filmComment;
 
   return {
-    emoji,
-    comment,
-    commentDate,
-    author,
-  };
+    emoji: getElementFromArray(EMOJIS),
+    comment: generateSentenceFromString(descriptionString),
+    commentDate: dateTime.fromNow(),
+    author: getElementFromArray(names),
+ }
 };
 
 export const generateFilm = () => {
