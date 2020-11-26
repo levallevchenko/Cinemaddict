@@ -110,7 +110,7 @@ const generateFilmComment = () => {
     comment: generateSentenceFromString(descriptionString),
     commentDate: commentDate.fromNow(),
     author: getElementFromArray(names),
- }
+  };
 };
 
 export const generateFilm = () => {
