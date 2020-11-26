@@ -20,10 +20,9 @@ export default class FilmList {
     this._filmListContainer = filmListContainer;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
-    this._filmPresenter = {};
 
     this._filmListComponent = new FilmListView();
-    this._sortComponent = new SortView();
+    this._sortComponent = new SortView(this._currentSortType);
     this._noFilmsComponent = new NoFilmsView();
     this._showMoreButtonComponent = new ShowMoreButtonView();
     this._topRatedFilmsComponent = new TopRatedFilmsView();
@@ -147,6 +146,11 @@ export default class FilmList {
     if (this._films.length > FILM_COUNT_PER_STEP) {
       this._renderShowMoreButton();
     }
+  }
+
+  _clearFilmList() {
+    this._filmsContainer.innerHTML = ``;
+    this._renderedFilmCount = FILM_COUNT_PER_STEP;
   }
 
   _renderAllFilms() {

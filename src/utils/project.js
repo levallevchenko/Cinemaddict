@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const getFormatTime = (seconds) => {
   const hours = `${Math.floor(seconds / 3600)}h`;
   const minutes = `${Math.floor(seconds / 60) % 60}m`;
@@ -17,16 +19,16 @@ export const escPressHandler = (evt, action) => {
   }
 };
 
-const getWeightForNoDataFilm = (dateA, dateB) => {
-  if (dateA === null && dateB === null) {
+const getWeightForNoDataFilm = (dataA, dataB) => {
+  if (dataA === null && dataB === null) {
     return 0;
   }
 
-  if (dateA === null) {
+  if (dataA === null) {
     return 1;
   }
 
-  if (dateB === null) {
+  if (dataB === null) {
     return -1;
   }
 
@@ -34,13 +36,13 @@ const getWeightForNoDataFilm = (dateA, dateB) => {
 };
 
 export const sortByDate = (filmA, filmB) => {
-  const weight = getWeightForNoDataFilm(filmA.date, filmB.date);
+  const weight = getWeightForNoDataFilm(filmA.releaseDate, filmB.releaseDate);
 
   if (weight !== null) {
     return weight;
   }
 
-  return filmB.date.getTime() - filmA.date.getTime();
+  return dayjs(filmB.releaseDate).diff(filmA.releaseDate);
 };
 
 export const sortByRating = (filmA, filmB) => {
