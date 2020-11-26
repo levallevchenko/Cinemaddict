@@ -4,7 +4,7 @@ import AbstractView from "./abstract.js";
 
 const createFilmCardTemplate = (film) => {
 
-  const {filmPoster, filmTitle, rating, filmCreateYear, filmDuration, genres, description, commentsCount, isWatchlist, isWatched, isFavorite} = film;
+  const {filmPoster, filmTitle, rating, releaseYear, filmDuration, genres, description, commentsCount, isWatchlist, isWatched, isFavorite} = film;
 
   const shortDescription = description.toString().length > MAX_DESCRIPTION_LENGTH ? `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)} …` : description;
 
@@ -21,7 +21,7 @@ const createFilmCardTemplate = (film) => {
       <h3 class="film-card__title">${filmTitle}</h3>
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
-        <span class="film-card__year">${filmCreateYear}</span>
+        <span class="film-card__year">${releaseYear}</span>
         <span class="film-card__duration">${filmDuration}</span>
         <span class="film-card__genre">${genre}</span>
       </p>
