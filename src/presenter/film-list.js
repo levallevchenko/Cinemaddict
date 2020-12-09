@@ -86,18 +86,16 @@ export default class FilmList {
     this._filmDetailsComponent = new FilmDetailsView(film);
     this._commentsComponent = new CommentsView(film);
 
-    this._closeFilmDetails = () => remove(this._filmDetailsComponent);
+    this._detailsScreenEscPressHandler = (evt) => escPressHandler(evt, this._closeFilmDetails);
+    document.addEventListener(`keydown`, this._detailsScreenEscPressHandler);
+
+    this._closeFilmDetails = () => {
+      remove(this._filmDetailsComponent);
+      document.removeEventListener(`keydown`, this._detailsScreenEscPressHandler);
+    };
 
     this._handleCloseButtonClick = () => this._closeFilmDetails();
     this._filmDetailsComponent.setCloseButtonClickHandler(this._handleCloseButtonClick);
-
-    this._detailsScreenEscPressHandler = (evt) => escPressHandler(evt, this._closeFilmDetails);
-
-    if (this._filmDetailsComponent) {
-      document.addEventListener(`keydown`, this._detailsScreenEscPressHandler);
-    } else {
-      document.removeEventListener(`keydown`, this._detailsScreenEscPressHandler);
-    }
 
     render(this._filmListContainer, this._filmDetailsComponent, RenderPosition.BEFOREEND);
     render(this._filmDetailsComponent, this._commentsComponent, RenderPosition.BEFOREEND);
