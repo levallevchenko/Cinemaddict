@@ -81,6 +81,19 @@ export default class FilmList {
     render(this._filmListContainer, this._noFilmsComponent, RenderPosition.BEFOREEND);
   }
 
+  _updateFilmCard(container) {
+    if (container.contains(prevFilmCardComponent.getElement())) {
+      replace(this._filmCardComponent, prevFilmCardComponent);
+    }
+
+    if (container.contains(prevFilmDetailsComponent.getElement())) {
+      replace(this._filmDetailsComponent, prevFilmDetailsComponent);
+    }
+
+    remove(prevFilmCardComponent);
+    remove(prevDetailsComponent);
+  }
+
   _renderFilmCard(container, film) {
     const prevFilmCardComponent = this._filmCardComponent;
     const prevFilmDetailsComponent = this._filmDetailsComponent;
@@ -94,16 +107,7 @@ export default class FilmList {
       return;
     }
 
-    if (container.contains(prevCardComponent.getElement())) {
-      replace(this._filmCardComponent, prevCardComponent);
-    }
-
-    if (container.contains(prevDetailsComponent.getElement())) {
-      replace(this._filmDetailsComponent, prevDetailsComponent);
-    }
-
-    remove(prevFilmCardComponent);
-    remove(prevDetailsComponent);
+    this._updateFilmCard(container);
   }
 
   _renderFilmDetails(film) {
