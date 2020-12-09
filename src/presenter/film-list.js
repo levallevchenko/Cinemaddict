@@ -1,5 +1,5 @@
 import {escPressHandler} from "../utils/project.js";
-import {render, RenderPosition, remove} from "../utils/render.js";
+import {render, RenderPosition, remove, replace} from "../utils/render.js";
 import {sortByDate, sortByRating} from "../utils/project.js";
 import {SortType} from "../const.js";
 import SortView from "../view/films-sort.js";
@@ -28,7 +28,12 @@ export default class FilmList {
     this._topRatedFilmsComponent = new TopRatedFilmsView();
     this._MostCommentedFilmsComponent = new MostCommentedFilmsView();
 
+    this._filmCardComponent = null;
+    this._filmDetailsComponent = null;
+    this._commentsComponent = null;
+
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
 
     this._filmsList = this._filmListComponent.getElement().querySelector(`.films-list`);
     this._filmsContainer = this._filmListComponent.getElement().querySelector(`.films-list__container`);
@@ -77,9 +82,28 @@ export default class FilmList {
   }
 
   _renderFilmCard(container, film) {
+    const prevFilmCardComponent = this._filmCardComponent;
+    const prevFilmDetailsComponent = this._filmDetailsComponent;
+
     this._filmCardComponent = new FilmCardView(film);
+
     this._filmCardComponent.setFilmCardClickHandler(() => this._renderFilmDetails(film));
-    render(container, this._filmCardComponent, RenderPosition.BEFOREEND);
+
+    if (prevFilmCardComponent === null || prevFilmDetailsComponent === null) {
+      render(container, this._filmCardComponent, RenderPosition.BEFOREEND);
+      return;
+    }
+
+    if (container.contains(prevCardComponent.getElement())) {
+      replace(this._filmCardComponent, prevCardComponent);
+    }
+
+    if (container.contains(prevDetailsComponent.getElement())) {
+      replace(this._filmDetailsComponent, prevDetailsComponent);
+    }
+
+    remove(prevFilmCardComponent);
+    remove(prevDetailsComponent);
   }
 
   _renderFilmDetails(film) {
