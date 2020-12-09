@@ -21,6 +21,9 @@ export default class FilmList {
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
 
+    this._filmPresenter = new Map;
+    console.log('this._filmPresenter: ', this._filmPresenter);
+
     this._filmListComponent = new FilmListView();
     this._sortComponent = new SortView(this._currentSortType);
     this._noFilmsComponent = new NoFilmsView();
@@ -68,7 +71,7 @@ export default class FilmList {
     }
 
     this._sortFilmCards(sortType);
-    this._clearFilmList();
+    this._destroy();
     this._renderFilmList();
   }
 
@@ -99,6 +102,7 @@ export default class FilmList {
     const prevFilmDetailsComponent = this._filmDetailsComponent;
 
     this._filmCardComponent = new FilmCardView(film);
+    this._filmPresenter[film.id] = this._filmCardComponent;
 
     this._filmCardComponent.setFilmCardClickHandler(() => this._renderFilmDetails(film));
 
@@ -175,8 +179,17 @@ export default class FilmList {
   }
 
   _clearFilmList() {
-    this._filmsContainer.innerHTML = ``;
+    Object
+      .values(this._filmPresenter)
+      .forEach((presenter) => presenter.this._destroy());
+    this._filmPresenter = {};
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
+    remove(this._showMoreButtonComponent);
+  }
+
+  _destroy() {
+    remove(this._filmCardComponent);
+    remove(this._filmDetailsComponent);
   }
 
   _renderAllFilms() {
