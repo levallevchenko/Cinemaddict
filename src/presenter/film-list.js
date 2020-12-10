@@ -1,6 +1,6 @@
-import {escPressHandler} from "../utils/project.js";
+import {escPressHandler, sortByDate, sortByRating} from "../utils/project.js";
 import {render, RenderPosition, remove, replace} from "../utils/render.js";
-import {sortByDate, sortByRating} from "../utils/project.js";
+import {updateItem} from "../utils/common.js";
 import {SortType} from "../const.js";
 import SortView from "../view/films-sort.js";
 import NoFilmsView from "../view/no-films.js";
@@ -21,8 +21,7 @@ export default class FilmList {
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
 
-    this._filmPresenter = new Map;
-    console.log('this._filmPresenter: ', this._filmPresenter);
+    this._filmInstanceList = new Map;
 
     this._filmListComponent = new FilmListView();
     this._sortComponent = new SortView(this._currentSortType);
@@ -34,6 +33,8 @@ export default class FilmList {
     this._filmCardComponent = null;
     this._filmDetailsComponent = null;
     this._commentsComponent = null;
+
+    this._handleFilmChange = this._handleFilmChange.bind(this);
 
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
@@ -48,6 +49,12 @@ export default class FilmList {
 
     render(this._filmListContainer, this._filmListComponent, RenderPosition.BEFOREEND);
     this._renderAllFilms();
+  }
+
+  _handleFilmChange(updatedFilm) {
+    this._films = updateItem(this._films, updatedFilm);
+    // new FilmCardView(updatedFilm);
+    // this._renderFilmCard(container, updatedFilm..);???
   }
 
   _sortFilmCards(sortType) {
@@ -97,12 +104,13 @@ export default class FilmList {
     remove(prevDetailsComponent);
   }
 
-  _renderFilmCard(container, film) {
+  _renderFilmCard(container, film, changeData) {
     const prevFilmCardComponent = this._filmCardComponent;
     const prevFilmDetailsComponent = this._filmDetailsComponent;
 
     this._filmCardComponent = new FilmCardView(film);
-    this._filmPresenter[film.id] = this._filmCardComponent;
+    this._filmInstanceList[film.id] = this._filmCardComponent;
+    this._changeData = changeData;
 
     this._filmCardComponent.setFilmCardClickHandler(() => this._renderFilmDetails(film));
 
@@ -112,6 +120,50 @@ export default class FilmList {
     }
 
     this._updateFilmCard(container);
+
+    this._handleWatchlistClick = () => {
+      this._changeData(
+        Object.assign(
+          {},
+          film,
+          {
+            isWatchlist: !film.isWatchlist
+          }
+        )
+      );
+    }
+
+    this._handleWatchedClick = () => {
+      this._changeData(
+        Object.assign(
+          {},
+          film,
+          {
+            isWatched: !film.isWatched
+          }
+        )
+      );
+    }
+
+    this._handleFavoriteClick = () => {
+      this._changeData(
+        Object.assign(
+          {},
+          film,
+          {
+            isFavorite: !film.isFavorite
+          }
+        )
+      );
+    }
+
+    this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
+    this._handleWatchedClick = this._handleWatchedClick.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+
+    this._filmCardComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    this._filmCardComponent.setWatchedClickHandler(this._handleWatchedClick);
+    this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
   }
 
   _renderFilmDetails(film) {
@@ -149,10 +201,10 @@ export default class FilmList {
     });
   }
 
-  _renderFilms(container, from, to) {
+  _renderFilms(container, from, to, changeData) {
     this._films
       .slice(from, to)
-      .forEach((film) => this._renderFilmCard(container, film));
+      .forEach((film) => this._renderFilmCard(container, film, changeData));
   }
 
   _renderExtraFilms() {
@@ -171,7 +223,7 @@ export default class FilmList {
       this._renderNoFilms();
       return;
     }
-    this._renderFilms(this._filmsContainer, 0, Math.min(this._films.length, FILM_COUNT_PER_STEP));
+    this._renderFilms(this._filmsContainer, 0, Math.min(this._films.length, FILM_COUNT_PER_STEP), this._handleFilmChange);
 
     if (this._films.length > FILM_COUNT_PER_STEP) {
       this._renderShowMoreButton();
@@ -180,9 +232,9 @@ export default class FilmList {
 
   _clearFilmList() {
     Object
-      .values(this._filmPresenter)
-      .forEach((presenter) => presenter.this._destroy());
-    this._filmPresenter = {};
+      .values(this._filmInstanceList)
+      .forEach((filmInstance) => filmInstance.this._destroy());
+    this._filmInstanceList = {};
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     remove(this._showMoreButtonComponent);
   }
@@ -196,4 +248,5 @@ export default class FilmList {
     this._renderFilmList();
     this._renderExtraFilms();
   }
+
 }
