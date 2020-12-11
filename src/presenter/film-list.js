@@ -21,7 +21,7 @@ export default class FilmList {
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     this._currentSortType = SortType.DEFAULT;
 
-    this._filmInstanceList = new Map;
+    this._filmInstanceList = new Map();
 
     this._filmListComponent = new FilmListView();
     this._sortComponent = new SortView(this._currentSortType);
@@ -91,22 +91,9 @@ export default class FilmList {
     render(this._filmListContainer, this._noFilmsComponent, RenderPosition.BEFOREEND);
   }
 
-  _updateFilmCard(container) {
-    if (container.contains(prevFilmCardComponent.getElement())) {
-      replace(this._filmCardComponent, prevFilmCardComponent);
-    }
-
-    if (container.contains(prevFilmDetailsComponent.getElement())) {
-      replace(this._filmDetailsComponent, prevFilmDetailsComponent);
-    }
-
-    remove(prevFilmCardComponent);
-    remove(prevDetailsComponent);
-  }
-
   _renderFilmCard(container, film, changeData) {
-    const prevFilmCardComponent = this._filmCardComponent;
-    const prevFilmDetailsComponent = this._filmDetailsComponent;
+    this._prevFilmCardComponent = this._filmCardComponent;
+    this._prevFilmDetailsComponent = this._filmDetailsComponent;
 
     this._filmCardComponent = new FilmCardView(film);
     this._filmInstanceList[film.id] = this._filmCardComponent;
@@ -114,7 +101,7 @@ export default class FilmList {
 
     this._filmCardComponent.setFilmCardClickHandler(() => this._renderFilmDetails(film));
 
-    if (prevFilmCardComponent === null || prevFilmDetailsComponent === null) {
+    if (this._prevFilmCardComponent === null || this._prevFilmDetailsComponent === null) {
       render(container, this._filmCardComponent, RenderPosition.BEFOREEND);
       return;
     }
@@ -123,39 +110,39 @@ export default class FilmList {
 
     this._handleWatchlistClick = () => {
       this._changeData(
-        Object.assign(
-          {},
-          film,
-          {
-            isWatchlist: !film.isWatchlist
-          }
-        )
+          Object.assign(
+              {},
+              film,
+              {
+                isWatchlist: !film.isWatchlist
+              }
+          )
       );
-    }
+    };
 
     this._handleWatchedClick = () => {
       this._changeData(
-        Object.assign(
-          {},
-          film,
-          {
-            isWatched: !film.isWatched
-          }
-        )
+          Object.assign(
+              {},
+              film,
+              {
+                isWatched: !film.isWatched
+              }
+          )
       );
-    }
+    };
 
     this._handleFavoriteClick = () => {
       this._changeData(
-        Object.assign(
-          {},
-          film,
-          {
-            isFavorite: !film.isFavorite
-          }
-        )
+          Object.assign(
+              {},
+              film,
+              {
+                isFavorite: !film.isFavorite
+              }
+          )
       );
-    }
+    };
 
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
@@ -164,6 +151,19 @@ export default class FilmList {
     this._filmCardComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmCardComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+  }
+
+  _updateFilmCard(container) {
+    if (container.contains(this._prevFilmCardComponent.getElement())) {
+      replace(this._filmCardComponent, this._prevFilmCardComponent);
+    }
+
+    if (container.contains(this._prevFilmDetailsComponent.getElement())) {
+      replace(this._filmDetailsComponent, this._prevFilmDetailsComponent);
+    }
+
+    remove(this._prevFilmCardComponent);
+    remove(this._prevDetailsComponent);
   }
 
   _renderFilmDetails(film) {
