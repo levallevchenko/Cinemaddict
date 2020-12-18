@@ -15,13 +15,15 @@ import MostCommentedFilmsView from "../view/most-commented-films.js";
 const FILM_COUNT_PER_STEP = 5;
 const FILM_EXTRA_COUNT = 2;
 
+const Mode = {
+  DEFAULT: `DEFAULT`,
+  POPUP: `POPUP`
+};
+
 export default class FilmList {
   constructor(filmListContainer) {
     this._filmListContainer = filmListContainer;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
-    this._currentSortType = SortType.DEFAULT;
-
-    this._filmInstanceList = new Map();
 
     this._filmListComponent = new FilmListView();
     this._sortComponent = new SortView(this._currentSortType);
@@ -30,17 +32,23 @@ export default class FilmList {
     this._topRatedFilmsComponent = new TopRatedFilmsView();
     this._MostCommentedFilmsComponent = new MostCommentedFilmsView();
 
-    this._filmCardComponent = null;
+    this._cardComponent = new Map();
     this._filmDetailsComponent = null;
-    this._commentsComponent = null;
+    this._currentSortType = SortType.DEFAULT;
+    this._mode = Mode.DEFAULT;
 
-    this._handleFilmChange = this._handleFilmChange.bind(this);
+    this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
+    this._handleWatchedClick = this._handleWatchedClick.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
 
+    this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
 
-    this._filmsList = this._filmListComponent.getElement().querySelector(`.films-list`);
-    this._filmsContainer = this._filmListComponent.getElement().querySelector(`.films-list__container`);
+    this._renderFilmCard = this._renderFilmCard.bind(this);
+
+    this._filmsList = this._filmListComponent.getElement().querySelector(`.films-list`); // список
+    this._filmsContainer = this._filmListComponent.getElement().querySelector(`.films-list__container`); // карточки
   }
 
   init(films) {
@@ -48,13 +56,26 @@ export default class FilmList {
     this._sourcedFilms = films.slice();
 
     render(this._filmListContainer, this._filmListComponent, RenderPosition.BEFOREEND);
-    this._renderAllFilms();
+    this._renderFilmList();
+    this._renderExtraFilms();
+  }
+
+  _resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      remove(this._filmDetailsComponent);
+    }
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._cardComponent)
+      .forEach((component) => component.this._resetView());
   }
 
   _handleFilmChange(updatedFilm) {
     this._films = updateItem(this._films, updatedFilm);
-    // new FilmCardView(updatedFilm);
-    // this._renderFilmCard(container, updatedFilm..);???
+    this._reRenderFilmCard(updatedFilm);
+    this._reRenderFilmDetails(updatedFilm);
   }
 
   _sortFilmCards(sortType) {
@@ -91,98 +112,107 @@ export default class FilmList {
     render(this._filmListContainer, this._noFilmsComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderFilmCard(container, film, changeData) {
-    this._prevFilmCardComponent = this._filmCardComponent;
-    this._prevFilmDetailsComponent = this._filmDetailsComponent;
+  _createFilmCard(film) {
+    const filmCardComponent = new FilmCardView(film);
 
-    this._filmCardComponent = new FilmCardView(film);
-    this._filmInstanceList[film.id] = this._filmCardComponent;
-    this._changeData = changeData;
+    filmCardComponent.setFilmCardClickHandler(() => this._renderFilmDetails(film));
+    filmCardComponent.setWatchlistClickHandler(() => this._handleWatchlistClick(film));
+    filmCardComponent.setWatchedClickHandler(() => this._handleWatchedClick(film));
+    filmCardComponent.setFavoriteClickHandler(() => this._handleFavoriteClick(film));
 
-    this._filmCardComponent.setFilmCardClickHandler(() => this._renderFilmDetails(film));
-
-    if (this._prevFilmCardComponent === null || this._prevFilmDetailsComponent === null) {
-      render(container, this._filmCardComponent, RenderPosition.BEFOREEND);
-      return;
-    }
-
-    this._updateFilmCard(container);
-
-    this._handleWatchlistClick = () => {
-      this._changeData(
-          Object.assign(
-              {},
-              film,
-              {
-                isWatchlist: !film.isWatchlist
-              }
-          )
-      );
-    };
-
-    this._handleWatchedClick = () => {
-      this._changeData(
-          Object.assign(
-              {},
-              film,
-              {
-                isWatched: !film.isWatched
-              }
-          )
-      );
-    };
-
-    this._handleFavoriteClick = () => {
-      this._changeData(
-          Object.assign(
-              {},
-              film,
-              {
-                isFavorite: !film.isFavorite
-              }
-          )
-      );
-    };
-
-    this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
-    this._handleWatchedClick = this._handleWatchedClick.bind(this);
-    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-
-    this._filmCardComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    this._filmCardComponent.setWatchedClickHandler(this._handleWatchedClick);
-    this._filmCardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    return filmCardComponent;
   }
 
-  _updateFilmCard(container) {
-    if (container.contains(this._prevFilmCardComponent.getElement())) {
-      replace(this._filmCardComponent, this._prevFilmCardComponent);
-    }
+  _renderFilmCard(container, film) {
+    this._filmCardComponent = this._createFilmCard(film);
 
-    if (container.contains(this._prevFilmDetailsComponent.getElement())) {
-      replace(this._filmDetailsComponent, this._prevFilmDetailsComponent);
-    }
+    this._cardComponent.set(film.id, this._filmCardComponent);
+    this._handleModeChange(film);
 
-    remove(this._prevFilmCardComponent);
-    remove(this._prevDetailsComponent);
+    render(container, this._filmCardComponent, RenderPosition.BEFOREEND);
+  }
+
+  _reRenderFilmCard(film) {
+    const filmCardComponent = this._createFilmCard(film);
+    // Новым компонентом заменяем старый
+    replace(filmCardComponent, this._cardComponent.get(film.id));
+    // Перезапишет по тому же ключу
+    this._cardComponent.set(film.id, filmCardComponent);
   }
 
   _renderFilmDetails(film) {
     this._filmDetailsComponent = new FilmDetailsView(film);
     this._commentsComponent = new CommentsView(film);
 
-    this._detailsScreenEscPressHandler = (evt) => escPressHandler(evt, this._closeFilmDetails);
-    document.addEventListener(`keydown`, this._detailsScreenEscPressHandler);
+    this._mode = Mode.POPUP;
+    // this._handleModeChange();
+
+    const escKeyDownHandler = (evt) => escPressHandler(evt, this._closeFilmDetails);
+
+    document.addEventListener(`keydown`, escKeyDownHandler);
 
     this._closeFilmDetails = () => {
       remove(this._filmDetailsComponent);
-      document.removeEventListener(`keydown`, this._detailsScreenEscPressHandler);
+      document.removeEventListener(`keydown`, escKeyDownHandler);
     };
 
-    this._handleCloseButtonClick = () => this._closeFilmDetails();
-    this._filmDetailsComponent.setCloseButtonClickHandler(this._handleCloseButtonClick);
+    this._filmDetailsComponent.setCloseButtonClickHandler(() => this._closeFilmDetails());
+    this._filmDetailsComponent.setFavoriteClickHandler(() => this._handleFavoriteClick(film));
+    this._filmDetailsComponent.setWatchlistClickHandler(() => this._handleWatchlistClick(film));
+    this._filmDetailsComponent.setWatchedClickHandler(() => this._handleWatchedClick(film));
 
     render(this._filmListContainer, this._filmDetailsComponent, RenderPosition.BEFOREEND);
     render(this._filmDetailsComponent, this._commentsComponent, RenderPosition.BEFOREEND);
+  }
+
+  _reRenderFilmDetails(film) {
+    this._filmDetailsComponent = new FilmDetailsView(film);
+
+    this._renderFilmDetails(film);
+
+    const prevFilmDetailsComponent = this._filmDetailsComponent;
+
+    if (this._mode === Mode.POPUP) {
+      replace(this._filmDetailsComponent, prevFilmDetailsComponent);
+    }
+
+    remove(prevFilmDetailsComponent);
+  }
+
+  _handleWatchlistClick(film) {
+    this._handleFilmChange(
+        Object.assign(
+            {},
+            film,
+            {
+              isWatchlist: !film.isWatchlist
+            }
+        )
+    );
+  }
+
+  _handleWatchedClick(film) {
+    this._handleFilmChange(
+        Object.assign(
+            {},
+            film,
+            {
+              isWatched: !film.isWatched
+            }
+        )
+    );
+  }
+
+  _handleFavoriteClick(film) {
+    this._handleFilmChange(
+        Object.assign(
+            {},
+            film,
+            {
+              isFavorite: !film.isFavorite
+            }
+        )
+    );
   }
 
   _handleShowMoreButtonClick() {
@@ -196,15 +226,13 @@ export default class FilmList {
 
   _renderShowMoreButton() {
     render(this._filmsList, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
-    this._showMoreButtonComponent.setShowMoreClickHandler(() => {
-      this._handleShowMoreButtonClick();
-    });
+    this._showMoreButtonComponent.setShowMoreClickHandler(this._handleShowMoreButtonClick);
   }
 
-  _renderFilms(container, from, to, changeData) {
+  _renderFilms(container, from, to) {
     this._films
       .slice(from, to)
-      .forEach((film) => this._renderFilmCard(container, film, changeData));
+      .forEach((film) => this._renderFilmCard(container, film));
   }
 
   _renderExtraFilms() {
@@ -223,7 +251,8 @@ export default class FilmList {
       this._renderNoFilms();
       return;
     }
-    this._renderFilms(this._filmsContainer, 0, Math.min(this._films.length, FILM_COUNT_PER_STEP), this._handleFilmChange);
+
+    this._renderFilms(this._filmsContainer, 0, Math.min(this._films.length, FILM_COUNT_PER_STEP));
 
     if (this._films.length > FILM_COUNT_PER_STEP) {
       this._renderShowMoreButton();
@@ -232,9 +261,9 @@ export default class FilmList {
 
   _clearFilmList() {
     Object
-      .values(this._filmInstanceList)
-      .forEach((filmInstance) => filmInstance.this._destroy());
-    this._filmInstanceList = {};
+      .values(this._cardComponent)
+      .forEach((component) => component._destroy());
+    this._cardComponent = {};
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     remove(this._showMoreButtonComponent);
   }
@@ -242,11 +271,6 @@ export default class FilmList {
   _destroy() {
     remove(this._filmCardComponent);
     remove(this._filmDetailsComponent);
-  }
-
-  _renderAllFilms() {
-    this._renderFilmList();
-    this._renderExtraFilms();
   }
 
 }
