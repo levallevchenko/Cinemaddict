@@ -99,7 +99,7 @@ export default class FilmList {
     }
 
     this._sortFilmCards(sortType);
-    this._destroy();
+    this._clearFilmList();
     this._renderFilmList();
   }
 
@@ -125,19 +125,20 @@ export default class FilmList {
 
   _renderFilmCard(container, film) {
     this._filmCardComponent = this._createFilmCard(film);
+    this._mode = Mode.DEFAULT;
 
     this._cardComponent.set(film.id, this._filmCardComponent);
-    this._handleModeChange(film);
+    this._handleModeChange();
 
     render(container, this._filmCardComponent, RenderPosition.BEFOREEND);
   }
 
   _reRenderFilmCard(film) {
-    const filmCardComponent = this._createFilmCard(film);
+    this._filmCardComponent = this._createFilmCard(film);
     // Новым компонентом заменяем старый
-    replace(filmCardComponent, this._cardComponent.get(film.id));
+    replace(this._filmCardComponent, this._cardComponent.get(film.id));
     // Перезапишет по тому же ключу
-    this._cardComponent.set(film.id, filmCardComponent);
+    this._cardComponent.set(film.id, this._filmCardComponent);
   }
 
   _renderFilmDetails(film) {
@@ -262,8 +263,8 @@ export default class FilmList {
   _clearFilmList() {
     Object
       .values(this._cardComponent)
-      .forEach((component) => component._destroy());
-    this._cardComponent = {};
+      .forEach((component) => component.this._destroy());
+    this._cardComponent = new Map();
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
     remove(this._showMoreButtonComponent);
   }
