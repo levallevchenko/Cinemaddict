@@ -142,11 +142,15 @@ export default class FilmList {
   }
 
   _renderFilmDetails(film) {
+    if (this._filmDetailsComponent !== null) {
+      this._closeFilmDetails();
+    }
+
     this._filmDetailsComponent = new FilmDetailsView(film);
     this._commentsComponent = new CommentsView(film);
 
     this._mode = Mode.POPUP;
-    // this._handleModeChange();
+    this._handleModeChange();
 
     const escKeyDownHandler = (evt) => escPressHandler(evt, this._closeFilmDetails);
 
