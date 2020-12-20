@@ -43,7 +43,9 @@ const createCommentsListTemplate = (film) => {
         </ul>
 
         <div class="film-details__new-comment">
-          <div for="add-emoji" class="film-details__add-emoji-label"></div>
+          <div for="add-emoji" class="film-details__add-emoji-label">
+
+          </div>
 
           <label class="film-details__comment-label">
             <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -61,9 +63,31 @@ export default class Comments extends AbstractView {
   constructor(film) {
     super();
     this._film = film;
+
+    this._emojiClickHandler = this._emojiClickHandler.bind(this);
   }
 
   _getTemplate() {
     return createCommentsListTemplate(this._film);
+  }
+
+  createCommentsEmoji(evt) {
+    const emojiName = evt.target.value.split(` `, 1);
+    const commentsEmoji = `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="${emojiName}" value="${emojiName}"></img>`;
+
+    return commentsEmoji;
+  }
+
+  _emojiClickHandler(evt) {
+    if (evt.target.classList.contains(`film-details__emoji-item`)) {
+      evt.preventDefault();
+      this._callback.emojiClick(evt);
+    }
+  }
+
+  setEmojiClickHandler(callback) {
+    const emojiList = this.getElement().querySelector(`.film-details__emoji-list`);
+    this._callback.emojiClick = callback;
+    emojiList.addEventListener(`click`, this._emojiClickHandler);
   }
 }

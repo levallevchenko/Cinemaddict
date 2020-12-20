@@ -157,6 +157,16 @@ export default class FilmList {
       document.removeEventListener(`keydown`, escKeyDownHandler);
     };
 
+    this._chooseEmoji = (evt) => {
+      const emojiContainer = document.querySelector(`.film-details__add-emoji-label`);
+      emojiContainer.removeChild(emojiContainer.firstChild);
+
+      const emoji = this._commentsComponent.createCommentsEmoji(evt);
+      emojiContainer.insertAdjacentHTML(RenderPosition.BEFOREEND, emoji);
+    }
+
+    this._commentsComponent.setEmojiClickHandler((evt) => this._chooseEmoji(evt));
+
     this._filmDetailsComponent.setCloseButtonClickHandler(() => this._closeFilmDetails());
     this._filmDetailsComponent.setFavoriteClickHandler(() => this._handleFavoriteClick(film));
     this._filmDetailsComponent.setWatchlistClickHandler(() => this._handleWatchlistClick(film));
