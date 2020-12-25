@@ -1,5 +1,5 @@
 import {EMOJIS} from "../const.js";
-import AbstractView from "../view/abstract.js";
+import SmartView from "./smart.js";
 import {generateTemplate} from "../utils/render.js";
 
 const createCommentTemplate = (commentElement) => {
@@ -59,12 +59,13 @@ const createCommentsListTemplate = (film) => {
     </div>`;
 };
 
-export default class Comments extends AbstractView {
+export default class Comments extends SmartView {
   constructor(film) {
     super();
     this._film = film;
 
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
+    this.setEmojiClickHandler(this._emojiClickHandler);
   }
 
   _getTemplate() {
@@ -78,16 +79,23 @@ export default class Comments extends AbstractView {
     return commentsEmoji;
   }
 
+  _chooseEmoji(evt) {
+    const emojiContainer = document.querySelector(`.film-details__add-emoji-label`);
+    emojiContainer.removeChild(emojiContainer.firstChild);
+
+    const emoji = this.createCommentsEmoji(evt);
+    emojiContainer.innerHTML = emoji;
+  }
+
   _emojiClickHandler(evt) {
     if (evt.target.classList.contains(`film-details__emoji-item`)) {
       evt.preventDefault();
-      this._callback.emojiClick(evt);
+      this._chooseEmoji(evt);
     }
   }
 
-  setEmojiClickHandler(callback) {
+  setEmojiClickHandler() {
     const emojiList = this.getElement().querySelector(`.film-details__emoji-list`);
-    this._callback.emojiClick = callback;
     emojiList.addEventListener(`click`, this._emojiClickHandler);
   }
 }
