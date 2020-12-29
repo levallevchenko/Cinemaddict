@@ -1,13 +1,13 @@
 import {generateTemplate} from "../utils/render.js";
 import {checkActiveElement} from "../utils/project.js";
-import AbstractView from "./abstract.js";
+import SmartView from "./smart.js";
 
 const createGenresTemplate = (genre) => {
   return `<span class="film-details__genre">${genre}</span>`;
 };
 
-const createFilmDetailsTemplate = (film) => {
-  const {filmPoster, filmTitle, rating, filmDuration, genres, description, filmOriginTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite} = film;
+const createFilmDetailsTemplate = (state) => {
+  const {filmPoster, filmTitle, rating, filmDuration, genres, description, filmOriginTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite} = state;
 
   const filmGenresTemplate = generateTemplate(genres, createGenresTemplate);
 
@@ -97,16 +97,19 @@ const createFilmDetailsTemplate = (film) => {
   );
 };
 
-export default class FilmDetails extends AbstractView {
+export default class FilmDetails extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
+    this._state = film;
 
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
+    this._watchlistToggleHandler = this._watchlistToggleHandler.bind(this);
+    this._watchedToggleHandler = this._watchedToggleHandler.bind(this);
+    this._favoriteToggleHandler = this._favoriteToggleHandler.bind(this);
   }
 
   _getTemplate() {
-    return createFilmDetailsTemplate(this._film);
+    return createFilmDetailsTemplate(this._state);
   }
 
   _closeButtonClickHandler(evt) {
@@ -114,9 +117,45 @@ export default class FilmDetails extends AbstractView {
     this._callback.click();
   }
 
+  _watchlistToggleHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  }
+
+  _watchedToggleHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  }
+
+  _favoriteToggleHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
   setCloseButtonClickHandler(callback) {
     const closeButton = this.getElement().querySelector(`.film-details__close-btn`);
     this._callback.click = callback;
     closeButton.addEventListener(`click`, this._closeButtonClickHandler);
+  }
+
+  setWatchlistChangeHandler(callback) {
+    this._callback.watchlistClick = callback;
+    this.getElement()
+        .querySelector(`#watchlist`)
+        .addEventListener(`change`, this._watchlistToggleHandler);
+  }
+
+  setWatchedChangeHandler(callback) {
+    this._callback.watchedClick = callback;
+    this.getElement()
+        .querySelector(`#watched`)
+        .addEventListener(`change`, this._watchedToggleHandler);
+  }
+
+  setFavoriteChangeHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement()
+        .querySelector(`#favorite`)
+        .addEventListener(`change`, this._favoriteToggleHandler);
   }
 }

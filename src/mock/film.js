@@ -1,10 +1,9 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import {nanoid} from "nanoid";
 import {getRandomInteger, getRandomNumber, getElementFromArray, generateSentenceFromString, generateRandomArray, generateRandomDate} from "../utils/common.js";
 import {getFormatTime} from "../utils/project.js";
 import {EMOJIS} from "../const.js";
-
-dayjs.extend(relativeTime);
 
 const NAMES_MIN_COUNT = 2;
 const NAMES_MAX_COUNT = 4;
@@ -25,7 +24,7 @@ const COMMENTS_MAX_COUNT = 5;
 
 const DATE_OF_FIRST_COMMENT = `2020, 2, 1`;
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+dayjs.extend(relativeTime);
 
 const filmTitles = [
   `The Dance of Life`,
@@ -114,7 +113,7 @@ const generateFilmComment = () => {
 };
 
 export const generateFilm = () => {
-  const id = generateId();
+  const id = nanoid();
   const filmTitle = getElementFromArray(filmTitles);
   const filmPoster = getElementFromArray(filmPosters);
   const description = generateRandomArray(descriptionArray, 1, 5);
