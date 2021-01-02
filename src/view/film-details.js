@@ -112,6 +112,13 @@ export default class FilmDetails extends SmartView {
     return createFilmDetailsTemplate(this._state);
   }
 
+  restoreHandlers() {
+    this.setCloseClickHandler(this._callback.click);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setWatchedlistClickHandler(this._callback.watchedClick);
+  }
+
   _closeButtonClickHandler(evt) {
     evt.preventDefault();
     this._callback.click();

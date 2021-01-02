@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {EMOJIS} from "../const.js";
 import SmartView from "./smart.js";
 import {generateTemplate} from "../utils/render.js";
@@ -28,11 +29,16 @@ const createEmojiTemplate = (emoji) => {
 };
 
 
-const createCommentsListTemplate = (film) => {
-  const {comments} = film;
+const createCommentsListTemplate = (state) => {
+  const {comments, commentEmoji, commentText} = state;
 
   const commentTemplate = generateTemplate(comments, createCommentTemplate);
   const emojiTemplate = generateTemplate(EMOJIS, createEmojiTemplate);
+
+  const renderComment = (comment) => {
+    const text = comment ? `${commentText}` : ``;
+    return text;
+  };
 
   return `<div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
@@ -48,7 +54,7 @@ const createCommentsListTemplate = (film) => {
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value=${commentText}>${renderComment(commentText)}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -62,40 +68,86 @@ const createCommentsListTemplate = (film) => {
 export default class Comments extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
+    this._state = film;
 
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
-    this.setEmojiClickHandler(this._emojiClickHandler);
+    this._messageInputHandler = this._messageInputHandler.bind(this);
+    this._messageToggleHandler = this._messageToggleHandler.bind(this);
+    this._setInnerHandlers();
   }
 
   _getTemplate() {
-    return createCommentsListTemplate(this._film);
+    return createCommentsListTemplate(this._state);
   }
 
-  createCommentsEmoji(evt) {
-    const emojiName = evt.target.value.split(` `, 1);
-    const commentsEmoji = `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="${emojiName}" value="${emojiName}"></img>`;
+  restoreHandlers() {
+    this._setInnerHandlers();
+  }
 
-    return commentsEmoji;
+  _createCommentEmoji(evt) {
+    const emojiName = evt.target.value.split(` `, 1);
+    const commentEmoji = `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="${emojiName}" value="${emojiName}"></img>`;
+
+    return commentEmoji;
   }
 
   _chooseEmoji(evt) {
     const emojiContainer = document.querySelector(`.film-details__add-emoji-label`);
-    emojiContainer.removeChild(emojiContainer.firstChild);
 
-    const emoji = this.createCommentsEmoji(evt);
+    const emoji = this._createCommentEmoji(evt);
     emojiContainer.innerHTML = emoji;
   }
 
   _emojiClickHandler(evt) {
     if (evt.target.classList.contains(`film-details__emoji-item`)) {
       evt.preventDefault();
-      this._chooseEmoji(evt);
+      this.updateData({
+        commentEmoji: evt.target.value.split(' ')[0]
+      });
+
+      if (this._state.commentEmoji) {
+        this._chooseEmoji(evt);
+      }
     }
   }
 
-  setEmojiClickHandler() {
-    const emojiList = this.getElement().querySelector(`.film-details__emoji-list`);
-    emojiList.addEventListener(`click`, this._emojiClickHandler);
+  _messageInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      commentText: evt.target.value
+    }, true);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+        .querySelector(`.film-details__emoji-list`)
+        .addEventListener(`click`, this._emojiClickHandler);
+    this.getElement()
+        .querySelector(`.film-details__comment-input`)
+        .addEventListener(`input`, this._messageInputHandler);
+    document.addEventListener(`keydown`, this._messageToggleHandler);
+  }
+
+  _messageToggleHandler(evt) {
+    this._commentEmoji = this._state.commentEmoji ? this._state.commentEmoji : ``;
+    this._commentText = this._state.commentText ? this._state.commentText : ``;
+    console.log(this._commentText.value);
+    if (evt.key === `Enter`) {
+      if (this._commentText === `` && this._commentEmoji === ``) {
+        return;
+      }
+      const newComment = {
+        text: this._commentText,
+        emoji: this._commentEmoji,
+        commentDate: dayjs().fromNow(),
+        author: this._state.comments[0].author
+      };
+      delete this._state.commentText;
+      delete this._state.commentEmoji;
+      document.removeEventListener(`keydown`, this._messageToggleHandler);
+      this.updateData({
+        comments: [...this._state.comments, newComment]
+      });
+    }
   }
 }
