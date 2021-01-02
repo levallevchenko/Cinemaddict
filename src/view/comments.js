@@ -71,8 +71,8 @@ export default class Comments extends SmartView {
     this._state = film;
 
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
-    this._messageInputHandler = this._messageInputHandler.bind(this);
-    this._messageToggleHandler = this._messageToggleHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._commentToggleHandler = this._commentToggleHandler.bind(this);
     this._setInnerHandlers();
   }
 
@@ -111,7 +111,7 @@ export default class Comments extends SmartView {
     }
   }
 
-  _messageInputHandler(evt) {
+  _commentInputHandler(evt) {
     evt.preventDefault();
     this.updateData({
       commentText: evt.target.value
@@ -124,20 +124,21 @@ export default class Comments extends SmartView {
         .addEventListener(`click`, this._emojiClickHandler);
     this.getElement()
         .querySelector(`.film-details__comment-input`)
-        .addEventListener(`input`, this._messageInputHandler);
-    document.addEventListener(`keydown`, this._messageToggleHandler);
+        .addEventListener(`input`, this._commentInputHandler);
+    document.addEventListener(`keydown`, this._commentToggleHandler);
   }
 
-  _messageToggleHandler(evt) {
+  _commentToggleHandler(evt) {
     this._commentEmoji = this._state.commentEmoji ? this._state.commentEmoji : ``;
     this._commentText = this._state.commentText ? this._state.commentText : ``;
-    console.log(this._commentText.value);
+
     if (evt.key === `Enter`) {
       if (this._commentText === `` && this._commentEmoji === ``) {
         return;
       }
+
       const newComment = {
-        text: this._commentText,
+        comment: this._commentText,
         emoji: this._commentEmoji,
         commentDate: dayjs().fromNow(),
         author: this._state.comments[0].author
