@@ -19,3 +19,10 @@ export const UserAction = {
   MINOR: `MINOR`,
   MAJOR: `MAJOR`
 };
+
+export const FilterType = {
+  ALL: `all`,
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITES: `favorites`
+};

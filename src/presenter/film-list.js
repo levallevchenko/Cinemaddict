@@ -1,7 +1,7 @@
 import {escPressHandler, sortByDate, sortByRating} from "../utils/project.js";
 import {render, RenderPosition, remove, replace} from "../utils/render.js";
-import {updateItem} from "../utils/common.js";
-import {SortType, UserAction, UpdateType} from "../const.js";
+import {filter} from "../utils/filter.js";
+import {SortType, UserAction, UpdateType, FilterType} from "../const.js";
 import SortView from "../view/films-sort.js";
 import NoFilmsView from "../view/no-films.js";
 import FilmListView from "../view/film-list.js";
@@ -16,8 +16,9 @@ const FILM_COUNT_PER_STEP = 5;
 const FILM_EXTRA_COUNT = 2;
 
 export default class FilmList {
-  constructor(filmListContainer, filmsModel) {
+  constructor(filmListContainer, filmsModel, filterModel) {
     this._filmsModel = filmsModel;
+    this._filterModel = filterModel;
     this._filmListContainer = filmListContainer;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
 
@@ -52,6 +53,7 @@ export default class FilmList {
     this._renderExtraFilmCard = this._renderExtraFilmCard.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
 
     this._filmsList = this._filmListComponent.getElement().querySelector(`.films-list`); // список
     this._filmsContainer = this._filmListComponent.getElement().querySelector(`.films-list__container`); // карточки
@@ -64,11 +66,23 @@ export default class FilmList {
   }
 
   _getFilms() {
+    const filterType = this._filterModel.getFilter();
+    const films = this._filmsModel.getFilms();
+
+    let filteredFilms = [];
+    if (filterType === FilterType.ALL) {
+      filteredFilms = films;
+    }
+    else {
+      filteredFilms = filter[filterType](films);
+      // ?? film-list.js:77 Uncaught TypeError: _utils_filter_js__WEBPACK_IMPORTED_MODULE_3__.filter[filterType] is not a function
+    }
+
     switch (this._currentSortType) {
       case SortType.DATE:
-        return this._filmsModel.getFilms().slice().sort(sortByDate);
+        return filteredFilms.sort(sortByDate);
       case SortType.RATING:
-        return this._filmsModel.getFilms().slice().sort(sortByRating);
+        return filteredFilms.sort(sortByRating);
     }
 
     return this._filmsModel.getFilms();
@@ -88,7 +102,7 @@ export default class FilmList {
     }
   }
 
-   _handleModelEvent(updateType, data) {
+   _handleModelEvent(updateType) {
     // В зависимости от типа изменений решаем, что делать:
     switch (updateType) {
       case UpdateType.PATCH:

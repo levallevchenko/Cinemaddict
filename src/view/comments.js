@@ -132,7 +132,7 @@ export default class Comments extends SmartView {
     this._commentEmoji = this._state.commentEmoji ? this._state.commentEmoji : ``;
     this._commentText = this._state.commentText ? this._state.commentText : ``;
 
-    if (evt.key === `Enter`) {
+    if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
       if (this._commentText === `` && this._commentEmoji === ``) {
         return;
       }
