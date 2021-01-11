@@ -1,14 +1,16 @@
 import {MAX_DESCRIPTION_LENGTH} from "../const.js";
-import {checkActiveElement} from "../utils/project.js";
+import {checkActiveElement, getFormatTime} from "../utils/project.js";
 import AbstractView from "./abstract.js";
 
 const createFilmCardTemplate = (film) => {
 
-  const {filmPoster, filmTitle, rating, releaseYear, filmDuration, genres, description, commentsCount, isWatchlist, isWatched, isFavorite} = film;
+  const {filmPoster, filmTitle, rating, releaseYear, filmDuration, genre, description, commentsCount, isWatchlist, isWatched, isFavorite} = film;
 
   const shortDescription = description.toString().length > MAX_DESCRIPTION_LENGTH ? `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)} …` : description;
 
-  const genre = genres[0];
+  const filmGenre = genre[0];
+
+  const formatFilmDuration = getFormatTime(filmDuration);
 
   const activeClass = `film-card__controls-item--active`;
 
@@ -22,8 +24,8 @@ const createFilmCardTemplate = (film) => {
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${releaseYear}</span>
-        <span class="film-card__duration">${filmDuration}</span>
-        <span class="film-card__genre">${genre}</span>
+        <span class="film-card__duration">${formatFilmDuration}</span>
+        <span class="film-card__genre">${filmGenre}</span>
       </p>
       <img src="./images/posters/${filmPoster}" alt="" class="film-card__poster">
       <p class="film-card__description">${shortDescription}</p>

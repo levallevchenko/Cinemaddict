@@ -16,8 +16,8 @@ const RATING_MIN_VALUE = 1;
 const RATING_MAX_VALUE = 10;
 
 const FILM_CREATE_MIN_DATE = `1900, 2, 1`;
-const FILM_MIN_DURATION = 1200;
-const FILM_MAX_DURATION = 14400;
+const FILM_MIN_DURATION = 90;
+const FILM_MAX_DURATION = 360;
 
 const COMMENTS_MIN_COUNT = 1;
 const COMMENTS_MAX_COUNT = 5;
@@ -122,10 +122,10 @@ export const generateFilm = () => {
   const filmReleaseDate = generateRandomDate(new Date(FILM_CREATE_MIN_DATE), new Date());
   const releaseDate = filmReleaseDate.format(`DD MMMM YYYY`);
   const releaseYear = filmReleaseDate.format(`YYYY`);
+  const watchingDate = filmReleaseDate;
 
-  const filmDurationInSecond = getRandomInteger(FILM_MIN_DURATION, FILM_MAX_DURATION);
-  const filmDuration = getFormatTime(filmDurationInSecond);
-  const genres = generateRandomArray(filmGenres, GENRES_MIN_COUNT, GENRES_MAX_COUNT);
+  const filmDuration = getRandomInteger(FILM_MIN_DURATION, FILM_MAX_DURATION);
+  const genre = generateRandomArray(filmGenres, GENRES_MIN_COUNT, GENRES_MAX_COUNT);
   const commentsCount = getRandomInteger(COMMENTS_MIN_COUNT, COMMENTS_MAX_COUNT);
 
   const filmOriginTitle = getElementFromArray(filmOriginTitles);
@@ -145,7 +145,7 @@ export const generateFilm = () => {
     rating,
     releaseYear,
     filmDuration,
-    genres,
+    genre,
     commentsCount,
 
     filmOriginTitle,
@@ -159,6 +159,7 @@ export const generateFilm = () => {
     isWatched: Boolean(getRandomInteger(0, 1)),
     isFavorite: Boolean(getRandomInteger(0, 1)),
     isEmoji: Boolean(getRandomInteger(0, 1)),
+    watchingDate,
     comments,
   };
 };

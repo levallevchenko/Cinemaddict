@@ -26,3 +26,22 @@ export const FilterType = {
   WATCHED: `watched`,
   FAVORITES: `favorites`
 };
+
+export const StatsPeriod = {
+  ALL: `all-time`,
+  TODAY: `day`,
+  WEEK: `week`,
+  MONTH: `month`,
+  YEAR: `year`
+};
+
+export const SiteState = {
+  MOVIES: `FILMS`,
+  STATS: `STATS`
+};
+
+export const UserRaiting = {
+  NOVICE: `novice`,
+  FAN: `fan`,
+  MOVIE_BUFF: `movie buff`
+};

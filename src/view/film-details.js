@@ -1,5 +1,5 @@
 import {generateTemplate} from "../utils/render.js";
-import {checkActiveElement} from "../utils/project.js";
+import {checkActiveElement, getFormatTime} from "../utils/project.js";
 import SmartView from "./smart.js";
 
 const createGenresTemplate = (genre) => {
@@ -7,15 +7,17 @@ const createGenresTemplate = (genre) => {
 };
 
 const createFilmDetailsTemplate = (state) => {
-  const {filmPoster, filmTitle, rating, filmDuration, genres, description, filmOriginTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite} = state;
+  const {filmPoster, filmTitle, rating, filmDuration, genre, description, filmOriginTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite} = state;
 
-  const filmGenresTemplate = generateTemplate(genres, createGenresTemplate);
+  const filmGenresTemplate = generateTemplate(genre, createGenresTemplate);
 
   const checkedClass = `checked`;
 
   const isWatchlistChecked = checkActiveElement(isWatchlist, checkedClass);
   const isWatchedChecked = checkActiveElement(isWatched, checkedClass);
   const isFavoriteChecked = checkActiveElement(isFavorite, checkedClass);
+
+  const formatFilmDuration = getFormatTime(filmDuration);
 
   return (
     `<section class="film-details">
@@ -62,14 +64,14 @@ const createFilmDetailsTemplate = (state) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${filmDuration}</td>
+                  <td class="film-details__cell">${formatFilmDuration}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
                   <td class="film-details__cell">${country}</td>
                 </tr>
                 <tr class="film-details__row">
-                  <td class="film-details__term">${genres.length > 1 ? `Genres` : `Genre`}</td>
+                  <td class="film-details__term">${genre.length > 1 ? `Genres` : `Genre`}</td>
                   <td class="film-details__cell">${filmGenresTemplate}</td>
                 </tr>
               </tbody></table>

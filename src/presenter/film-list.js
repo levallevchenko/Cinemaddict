@@ -65,27 +65,27 @@ export default class FilmList {
     this._renderExtraFilms();
   }
 
-  _getFilms() {
+  _getFilms(sortType) {
     const filterType = this._filterModel.getFilter();
     const films = this._filmsModel.getFilms();
+    const filteredFilms = filter[filterType](films);
+    const currentFilteredFilms = filteredFilms.slice();
 
-    let filteredFilms = [];
-    if (filterType === FilterType.ALL) {
-      filteredFilms = films;
-    }
-    else {
-      filteredFilms = filter[filterType](films);
-      // ?? film-list.js:77 Uncaught TypeError: _utils_filter_js__WEBPACK_IMPORTED_MODULE_3__.filter[filterType] is not a function
-    }
-
-    switch (this._currentSortType) {
+    switch (this._currentSortType || sortType) {
       case SortType.DATE:
-        return filteredFilms.sort(sortByDate);
+        return currentFilteredFilms.sort(sortByDate);
       case SortType.RATING:
-        return filteredFilms.sort(sortByRating);
+        return currentFilteredFilms.sort(sortByRating);
+      default:
+        return filteredFilms;
     }
+  }
 
-    return this._filmsModel.getFilms();
+  destroy() {
+    this._clearFilmList({resetRenderedFilms: true, resetSort: true});
+    remove(this._topRatedFilmsComponent);
+    remove(this._mostCommentedFilmsComponent);
+    remove(this._filmListComponent);
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -307,7 +307,7 @@ export default class FilmList {
 
   _renderFilmList() {
     const filmCount = this._getFilms().length;
-    const films = this._getFilms().slice(0, Math.min(filmCount, this._renderedFilmCount ));
+    const films = this._getFilms().slice(0, Math.min(filmCount, this._renderedFilmCount));
 
     if (filmCount === 0) {
       this._renderNoFilms();
