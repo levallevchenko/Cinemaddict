@@ -2,7 +2,6 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import {nanoid} from "nanoid";
 import {getRandomInteger, getRandomNumber, getElementFromArray, generateSentenceFromString, generateRandomArray, generateRandomDate} from "../utils/common.js";
-import {getFormatTime} from "../utils/project.js";
 import {EMOJIS} from "../const.js";
 
 const NAMES_MIN_COUNT = 2;

@@ -30,7 +30,7 @@ const createEmojiTemplate = (emoji) => {
 
 
 const createCommentsListTemplate = (state) => {
-  const {comments, commentEmoji, commentText} = state;
+  const {comments, commentText} = state;
 
   const commentTemplate = generateTemplate(comments, createCommentTemplate);
   const emojiTemplate = generateTemplate(EMOJIS, createEmojiTemplate);
@@ -102,7 +102,7 @@ export default class Comments extends SmartView {
     if (evt.target.classList.contains(`film-details__emoji-item`)) {
       evt.preventDefault();
       this.updateData({
-        commentEmoji: evt.target.value.split(' ')[0]
+        commentEmoji: evt.target.value.split(``)[0]
       });
 
       if (this._state.commentEmoji) {

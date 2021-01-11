@@ -3,8 +3,8 @@ import {render, RenderPosition, replace, remove} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {FilterType, UpdateType, SiteState} from "../const.js";
 
-  export default class Filter {
-   constructor(filterContainer, filterModel, filmsModel, changeSiteState) {
+export default class Filter {
+  constructor(filterContainer, filterModel, filmsModel, changeSiteState) {
     this._filterContainer = filterContainer;
     this._filterModel = filterModel;
     this._filmsModel = filmsModel;
@@ -21,50 +21,50 @@ import {FilterType, UpdateType, SiteState} from "../const.js";
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
-   }
+  }
 
-    init() {
-      this._currentFilter = this._filterModel.getFilter();
+  init() {
+    this._currentFilter = this._filterModel.getFilter();
 
-      const filters = this._getFilters();
-      const prevFilterComponent = this._filterComponent;
+    const filters = this._getFilters();
+    const prevFilterComponent = this._filterComponent;
 
-      this._filterComponent = new FilterView(filters, this._currentFilter);
-      this._filtersButtons = Array.from(this._filterComponent.getElement().querySelectorAll(`.main-navigation__item`));
+    this._filterComponent = new FilterView(filters, this._currentFilter);
+    this._filtersButtons = Array.from(this._filterComponent.getElement().querySelectorAll(`.main-navigation__item`));
 
-      this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
-      this._filterComponent.setStatsButtonClickHandler(this._handleStatsButtonClick);
+    this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
+    this._filterComponent.setStatsButtonClickHandler(this._handleStatsButtonClick);
 
-      if (prevFilterComponent === null) {
-        render(this._filterContainer, this._filterComponent, RenderPosition.BEFOREEND);
-        return;
-     }
+    if (prevFilterComponent === null) {
+      render(this._filterContainer, this._filterComponent, RenderPosition.BEFOREEND);
+      return;
+    }
 
-      replace(this._filterComponent, prevFilterComponent);
-      remove(prevFilterComponent);
-   }
+    replace(this._filterComponent, prevFilterComponent);
+    remove(prevFilterComponent);
+  }
 
-    _handleModelEvent() {
-      this.init();
-   }
+  _handleModelEvent() {
+    this.init();
+  }
 
-    _handleFilterTypeChange(filterType) {
-      if (this._currentFilter === filterType) {
-        return;
-      }
+  _handleFilterTypeChange(filterType) {
+    if (this._currentFilter === filterType) {
+      return;
+    }
 
-      if (!this._isFilmListShowing) {
-        this._isFilmListShowing = true;
-        this._changeSiteState(SiteState.FILMS);
-        return;
-      }
+    if (!this._isFilmListShowing) {
+      this._isFilmListShowing = true;
+      this._changeSiteState(SiteState.FILMS);
+      return;
+    }
 
-      this._filterModel.setFilter(UpdateType.MAJOR, filterType);
-   }
+    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+  }
 
   _handleStatsButtonClick() {
     if (!this._isFilmListShowing) {
-      return
+      return;
     }
     this._filtersButtons.forEach((filterButton) => {
       filterButton.classList.remove(`main-navigation__item--active`);
@@ -77,25 +77,25 @@ import {FilterType, UpdateType, SiteState} from "../const.js";
     this._changeSiteState(SiteState.STATS);
   }
 
-    _getFilters() {
-     const films = this._filmsModel.getFilms();
+  _getFilters() {
+    const films = this._filmsModel.getFilms();
 
-      return [
-        {
-          type: FilterType.WATCHLIST,
-          name: `watchlist`,
-          count: filter[FilterType.WATCHLIST](films).length
-        },
-        {
-          type: FilterType.WATCHED,
-          name: `watched`,
-          count: filter[FilterType.WATCHED](films).length
-        },
-        {
-          type: FilterType.FAVORITES,
-          name: `Favorites`,
-          count: filter[FilterType.FAVORITES](films).length
-        }
-     ];
-   }
- }
+    return [
+      {
+        type: FilterType.WATCHLIST,
+        name: `watchlist`,
+        count: filter[FilterType.WATCHLIST](films).length
+      },
+      {
+        type: FilterType.WATCHED,
+        name: `watched`,
+        count: filter[FilterType.WATCHED](films).length
+      },
+      {
+        type: FilterType.FAVORITES,
+        name: `Favorites`,
+        count: filter[FilterType.FAVORITES](films).length
+      }
+    ];
+  }
+}

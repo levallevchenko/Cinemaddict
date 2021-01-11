@@ -1,7 +1,7 @@
 import {escPressHandler, sortByDate, sortByRating} from "../utils/project.js";
 import {render, RenderPosition, remove, replace} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
-import {SortType, UserAction, UpdateType, FilterType} from "../const.js";
+import {SortType, UserAction, UpdateType} from "../const.js";
 import SortView from "../view/films-sort.js";
 import NoFilmsView from "../view/no-films.js";
 import FilmListView from "../view/film-list.js";
@@ -102,22 +102,22 @@ export default class FilmList {
     }
   }
 
-   _handleModelEvent(updateType) {
+  _handleModelEvent(updateType) {
     // В зависимости от типа изменений решаем, что делать:
     switch (updateType) {
       case UpdateType.PATCH:
       // - обновить часть списка (например, при изменении кнопки управления)
-      break;
-    case UpdateType.MINOR:
+        break;
+      case UpdateType.MINOR:
       // - обновить список (например, при изменении кнопки управления в отфильтрованном списке (возможно здесь MAJOR – сам фильтр и показ кнопки show more тоже изменятся. Но сброс сортировки не нужен (т.к в отфильтрованном всегда default))
-      this._clearFilmList();
-      this._renderFilmList();
-      break;
-    case UpdateType.MAJOR:
-      // - обновить всю доску (например, при переключении фильтра)
-      this._clearFilmList({resetRenderedFilmCount: true, resetSortType: true});
-      this._renderFilmList();
-      break;
+        this._clearFilmList();
+        this._renderFilmList();
+        break;
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        this._clearFilmList({resetRenderedFilmCount: true, resetSortType: true});
+        this._renderFilmList();
+        break;
     }
   }
 
@@ -145,7 +145,7 @@ export default class FilmList {
 
   _renderSort() {
     if (this._sortComponent !== null) {
-      this._sortComponent === null;
+      this._sortComponent = null;
     }
 
     this._sortComponent = new SortView(this._currentSortType);
@@ -278,7 +278,7 @@ export default class FilmList {
 
   _renderShowMoreButton() {
     if (this._showMoreButtonComponent !== null) {
-      this._showMoreButtonComponent === null;
+      this._showMoreButtonComponent = null;
     }
 
     this._showMoreButtonComponent = new ShowMoreButtonView();
@@ -342,7 +342,7 @@ export default class FilmList {
       this._renderedFilmCount = Math.min(filmCount, this._renderedFilmCount);
     }
 
-     if (resetSortType) {
+    if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;
     }
   }

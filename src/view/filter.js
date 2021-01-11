@@ -52,7 +52,7 @@ export default class Filter extends AbstractView {
     this._callback.siteStateChange(evt);
   }
 
-   setFilterTypeChangeHandler(callback) {
+  setFilterTypeChangeHandler(callback) {
     this._callback.filterTypeChange = callback;
     this.getElement().querySelector(`.main-navigation__items`).addEventListener(`click`, this._filterTypeChangeHandler);
   }

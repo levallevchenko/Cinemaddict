@@ -1,17 +1,17 @@
 export default class Observer {
   constructor() {
-    this._observers = new Set;
+    this._observers = new Set();
   }
 
-   addObserver(observer) {
+  addObserver(observer) {
     this._observers.add(observer);
   }
 
-   removeObserver(observer) {
+  removeObserver(observer) {
     this._observers.delete(observer);
   }
 
-   _notify(event, payload) {
+  _notify(event, payload) {
     this._observers.forEach((observer) => observer(event, payload));
   }
 }
