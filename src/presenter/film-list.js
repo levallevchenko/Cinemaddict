@@ -102,11 +102,12 @@ export default class FilmList {
     }
   }
 
-  _handleModelEvent(updateType) {
+  _handleModelEvent(updateType, updatedFilm) {
     // В зависимости от типа изменений решаем, что делать:
     switch (updateType) {
       case UpdateType.PATCH:
       // - обновить часть списка (например, при изменении кнопки управления)
+        this._handleFilmChange(updatedFilm);
         break;
       case UpdateType.MINOR:
       // - обновить список (например, при изменении кнопки управления в отфильтрованном списке (возможно здесь MAJOR – сам фильтр и показ кнопки show more тоже изменятся. Но сброс сортировки не нужен (т.к в отфильтрованном всегда default))
