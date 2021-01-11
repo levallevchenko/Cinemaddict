@@ -75,13 +75,13 @@ const renderChart = (statisticCtx) => {
 
 const genres = new Map();
 
-const createStats = (data) => {
-  const chosenPeriodTime = (data.period === StatsPeriod.ALL) ? -Infinity : dayjs().subtract(1, `${data.period}`);
+const createStats = (state) => {
+  const chosenPeriodTime = (state.period === StatsPeriod.ALL) ? -Infinity : dayjs().subtract(1, `${state.period}`);
 
   let filmsWatched = 0;
   let totalMinutesDuration = 0;
 
-  data.films.forEach((film) => {
+  state.films.forEach((film) => {
     if (film.isWatched && +new Date(film.watchingDate) > chosenPeriodTime) {
       filmsWatched++;
       totalMinutesDuration += film.filmDuration;
@@ -117,32 +117,32 @@ const createStats = (data) => {
   };
 
   const getCheckedState = (statsPeriod) => {
-    return (data.period === statsPeriod) ? ` checked` : ``;
+    return (state.period === statsPeriod) ? ` checked` : ``;
   };
 
   return `<section class="statistic">
   <p class="statistic__rank">
     Your rank
     <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-    <span class="statistic__rank-label">${data.userRaiting}</span>
+    <span class="statistic__rank-label">${state.userRaiting}</span>
   </p>
 
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
     <p class="statistic__filters-description">Show stats:</p>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="${StatsPeriod.ALL}"${getCheckedState(StatsPeriod.ALL)}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="${StatsPeriod.ALL}" ${getCheckedState(StatsPeriod.ALL)}>
     <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="${StatsPeriod.TODAY}"${getCheckedState(StatsPeriod.TODAY)}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="${StatsPeriod.TODAY}" ${getCheckedState(StatsPeriod.TODAY)}>
     <label for="statistic-today" class="statistic__filters-label">Today</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="${StatsPeriod.WEEK}"${getCheckedState(StatsPeriod.WEEK)}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="${StatsPeriod.WEEK}" ${getCheckedState(StatsPeriod.WEEK)}>
     <label for="statistic-week" class="statistic__filters-label">Week</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="${StatsPeriod.MONTH}"${getCheckedState(StatsPeriod.MONTH)}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="${StatsPeriod.MONTH}" ${getCheckedState(StatsPeriod.MONTH)}>
     <label for="statistic-month" class="statistic__filters-label">Month</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="${StatsPeriod.YEAR}"${getCheckedState(StatsPeriod.YEAR)}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="${StatsPeriod.YEAR}" ${getCheckedState(StatsPeriod.YEAR)}>
     <label for="statistic-year" class="statistic__filters-label">Year</label>
   </form>
 
@@ -171,7 +171,7 @@ const createStats = (data) => {
 export default class Stats extends Smart {
   constructor(films, userRaiting) {
     super();
-    this._data = {
+    this._state = {
       films,
       userRaiting,
       period: StatsPeriod.ALL
@@ -184,7 +184,7 @@ export default class Stats extends Smart {
   }
 
   _getTemplate() {
-    return createStats(this._data);
+    return createStats(this._state);
   }
 
   removeElement() {
@@ -199,6 +199,7 @@ export default class Stats extends Smart {
       return;
     }
     this.updateData({period: evt.target.value});
+    console.log('evt.target.value: ', evt.target.value);
     this._setChart();
   }
 

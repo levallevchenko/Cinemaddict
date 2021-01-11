@@ -121,7 +121,7 @@ export const generateFilm = () => {
   const filmReleaseDate = generateRandomDate(new Date(FILM_CREATE_MIN_DATE), new Date());
   const releaseDate = filmReleaseDate.format(`DD MMMM YYYY`);
   const releaseYear = filmReleaseDate.format(`YYYY`);
-  const watchingDate = filmReleaseDate;
+  const watchingDate = generateRandomDate(new Date(`2020-11-17T03:24:00`), new Date());
 
   const filmDuration = getRandomInteger(FILM_MIN_DURATION, FILM_MAX_DURATION);
   const genre = generateRandomArray(filmGenres, GENRES_MIN_COUNT, GENRES_MAX_COUNT);
