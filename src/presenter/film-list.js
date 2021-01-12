@@ -1,4 +1,4 @@
-import {escPressHandler, sortByDate, sortByRating} from "../utils/project.js";
+import {escPressHandler, sortByDate, sortByRating, sortByComments} from "../utils/project.js";
 import {render, RenderPosition, remove, replace} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {SortType, UserAction, UpdateType} from "../const.js";
@@ -132,6 +132,7 @@ export default class FilmList {
         this._isLoading = false;
         remove(this._loadingComponent);
         this._renderFilmList();
+        this._renderExtraFilms();
         break;
     }
   }
@@ -310,8 +311,8 @@ export default class FilmList {
   }
 
   _renderExtraFilms() {
-    const filmCount = this._getFilms().length;
-    const films = this._getFilms().slice(0, Math.min(filmCount, FILM_COUNT_PER_STEP));
+    const topRatedFilms = this._getFilms().slice().sort(sortByRating);
+    const mostCommentedFilms = this._getFilms().slice().sort(sortByComments);
 
     render(this._filmListComponent, this._topRatedFilmsComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._mostCommentedFilmsComponent, RenderPosition.BEFOREEND);
@@ -320,8 +321,8 @@ export default class FilmList {
     this._topRatedContainer = this._extraContainers[0];
     this._mostCommentedContainer = this._extraContainers[1];
 
-    this._renderFilms(films, this._cardTopRatedComponent, this._topRatedContainer, this._renderExtraFilmCard);
-    this._renderFilms(films, this._cardMostCommentedComponent, this._mostCommentedContainer, this._renderExtraFilmCard);
+    this._renderFilms(topRatedFilms, this._cardTopRatedComponent, this._topRatedContainer, this._renderExtraFilmCard);
+    this._renderFilms(mostCommentedFilms, this._cardMostCommentedComponent, this._mostCommentedContainer, this._renderExtraFilmCard);
   }
 
   _renderFilmList() {
@@ -361,9 +362,6 @@ export default class FilmList {
     if (resetRenderedFilmCount) {
       this._renderedFilmCount = FILM_COUNT_PER_STEP;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества фильмов (например, изменением кнопки управления в фильтрованном списке)
-      // нужно скорректировать число показанных фильмов
       this._renderedFilmCount = Math.min(filmCount, this._renderedFilmCount);
     }
 

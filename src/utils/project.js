@@ -55,3 +55,13 @@ export const sortByRating = (filmA, filmB) => {
   return filmB.rating - filmA.rating;
 };
 
+export const sortByComments = (filmA, filmB) => {
+  const weight = getWeightForNoDataFilm(filmA.comments.length, filmB.comments.length);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return filmB.comments.length - filmA.comments.length;
+};
+
