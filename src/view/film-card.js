@@ -1,16 +1,18 @@
+import dayjs from "dayjs";
 import {MAX_DESCRIPTION_LENGTH} from "../const.js";
 import {checkActiveElement, getFormatTime} from "../utils/project.js";
 import AbstractView from "./abstract.js";
 
 const createFilmCardTemplate = (film) => {
 
-  const {filmPoster, filmTitle, rating, releaseYear, filmDuration, genre, description, commentsCount, isWatchlist, isWatched, isFavorite} = film;
+  const {poster, title, rating, releaseDate, duration, genre, description, comments, isWatchlist, isWatched, isFavorite} = film;
 
+  const releaseYear = dayjs(releaseDate).format(`YYYY`);
   const shortDescription = description.toString().length > MAX_DESCRIPTION_LENGTH ? `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)} …` : description;
 
   const filmGenre = genre[0];
 
-  const formatFilmDuration = getFormatTime(filmDuration);
+  const formatFilmDuration = getFormatTime(duration);
 
   const activeClass = `film-card__controls-item--active`;
 
@@ -18,16 +20,18 @@ const createFilmCardTemplate = (film) => {
   const isWatchedActive = checkActiveElement(isWatched, activeClass);
   const isFavoriteActive = checkActiveElement(isFavorite, activeClass);
 
+  const commentsCount = comments.length;
+
   return (
     `<article class="film-card">
-      <h3 class="film-card__title">${filmTitle}</h3>
+      <h3 class="film-card__title">${title}</h3>
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${releaseYear}</span>
         <span class="film-card__duration">${formatFilmDuration}</span>
         <span class="film-card__genre">${filmGenre}</span>
       </p>
-      <img src="./images/posters/${filmPoster}" alt="" class="film-card__poster">
+      <img src="${poster}" alt="poster of ${title} film" class="film-card__poster">
       <p class="film-card__description">${shortDescription}</p>
       <a class="film-card__comments">${commentsCount} comments</a>
       <form class="film-card__controls">

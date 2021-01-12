@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {generateTemplate} from "../utils/render.js";
 import {checkActiveElement, getFormatTime} from "../utils/project.js";
 import SmartView from "./smart.js";
@@ -7,8 +8,9 @@ const createGenresTemplate = (genre) => {
 };
 
 const createFilmDetailsTemplate = (state) => {
-  const {filmPoster, filmTitle, rating, filmDuration, genre, description, filmOriginTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite} = state;
+  const {poster, title, rating, duration, genre, description, originalTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite} = state;
 
+  const filmReleaseDate = dayjs(releaseDate).format(`DD MMMM YYYY`);
   const filmGenresTemplate = generateTemplate(genre, createGenresTemplate);
 
   const checkedClass = `checked`;
@@ -17,7 +19,7 @@ const createFilmDetailsTemplate = (state) => {
   const isWatchedChecked = checkActiveElement(isWatched, checkedClass);
   const isFavoriteChecked = checkActiveElement(isFavorite, checkedClass);
 
-  const formatFilmDuration = getFormatTime(filmDuration);
+  const formatFilmDuration = getFormatTime(duration);
 
   return (
     `<section class="film-details">
@@ -28,16 +30,16 @@ const createFilmDetailsTemplate = (state) => {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="./images/posters/${filmPoster}" alt="">
+              <img class="film-details__poster-img" src="${poster}" alt="poster of ${title} film">
 
-              <p class="film-details__age">${ageLimit}</p>
+              <p class="film-details__age">${ageLimit}+</p>
             </div>
 
             <div class="film-details__info">
               <div class="film-details__info-head">
                 <div class="film-details__title-wrap">
-                  <h3 class="film-details__title">${filmTitle}</h3>
-                  <p class="film-details__title-original">Original: ${filmOriginTitle}</p>
+                  <h3 class="film-details__title">${title}</h3>
+                  <p class="film-details__title-original">Original: ${originalTitle}</p>
                 </div>
 
                 <div class="film-details__rating">
@@ -60,7 +62,7 @@ const createFilmDetailsTemplate = (state) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${releaseDate}</td>
+                  <td class="film-details__cell">${filmReleaseDate}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>

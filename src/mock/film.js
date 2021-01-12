@@ -33,7 +33,7 @@ const filmTitles = [
   `Popeye the Sailor Meets Sindbad the Sailor`,
 ];
 
-const filmPosters = [
+const posters = [
   `made-for-each-other.png`,
   `popeye-meets-sinbad.png`,
   `sagebrush-trail.jpg`,
@@ -49,7 +49,7 @@ const descriptionArray = descriptionString.split(`. `);
 
 const filmGenres = [`Western`, `Musical`, `Drama`, `Comedy`, `Cartoon`, `Horror`, `Film-Noir`, `Mystery`];
 
-const filmOriginTitles = [
+const originalTitles = [
   `The Dance of Life`,
   `Sagebrush Trail`,
   `The Man with the Golden Arm`,
@@ -114,7 +114,7 @@ const generateFilmComment = () => {
 export const generateFilm = () => {
   const id = nanoid();
   const filmTitle = getElementFromArray(filmTitles);
-  const filmPoster = getElementFromArray(filmPosters);
+  const poster = getElementFromArray(posters);
   const description = generateRandomArray(descriptionArray, 1, 5);
   const rating = getRandomNumber(RATING_MIN_VALUE, RATING_MAX_VALUE).toFixed(1);
 
@@ -123,11 +123,11 @@ export const generateFilm = () => {
   const releaseYear = filmReleaseDate.format(`YYYY`);
   const watchingDate = generateRandomDate(new Date(`2020-11-17T03:24:00`), new Date());
 
-  const filmDuration = getRandomInteger(FILM_MIN_DURATION, FILM_MAX_DURATION);
+  const duration = getRandomInteger(FILM_MIN_DURATION, FILM_MAX_DURATION);
   const genre = generateRandomArray(filmGenres, GENRES_MIN_COUNT, GENRES_MAX_COUNT);
   const commentsCount = getRandomInteger(COMMENTS_MIN_COUNT, COMMENTS_MAX_COUNT);
 
-  const filmOriginTitle = getElementFromArray(filmOriginTitles);
+  const originalTitle = getElementFromArray(originalTitles);
   const director = getElementFromArray(namesOfDirectors);
   const writers = generateRandomArray(namesOfWriters, NAMES_MIN_COUNT, NAMES_MAX_COUNT).join(`, `);
   const actors = generateRandomArray(namesOfActors, NAMES_MIN_COUNT, NAMES_MAX_COUNT).join(`, `);
@@ -139,15 +139,15 @@ export const generateFilm = () => {
   return {
     id,
     filmTitle,
-    filmPoster,
+    poster,
     description,
     rating,
     releaseYear,
-    filmDuration,
+    duration,
     genre,
     commentsCount,
 
-    filmOriginTitle,
+    originalTitle,
     director,
     writers,
     actors,

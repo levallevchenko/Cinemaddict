@@ -84,7 +84,7 @@ const createStats = (state) => {
   state.films.forEach((film) => {
     if (film.isWatched && +new Date(film.watchingDate) > chosenPeriodTime) {
       filmsWatched++;
-      totalMinutesDuration += film.filmDuration;
+      totalMinutesDuration += film.duration;
       film.genre.forEach((currentGenre) => {
         if (genres.has(currentGenre)) {
           genres.set(currentGenre, genres.get(currentGenre) + 1);
@@ -199,7 +199,6 @@ export default class Stats extends Smart {
       return;
     }
     this.updateData({period: evt.target.value});
-    console.log('evt.target.value: ', evt.target.value);
     this._setChart();
   }
 
