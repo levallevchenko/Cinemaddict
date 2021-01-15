@@ -7,6 +7,7 @@ import FilmListPresenter from "./presenter/film-list.js";
 import FilterPresenter from "./presenter/filter.js";
 import FilmsModel from "./model/films.js";
 import FilterModel from "./model/filter.js";
+import CommentsModel from "./model/comments.js";
 import UserModel from './model/user.js';
 import Api from "./api.js";
 
@@ -20,6 +21,11 @@ const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
 const filmCountElement = document.querySelector(`.footer__statistics`);
 
+const filmsModel = new FilmsModel();
+const filterModel = new FilterModel();
+const commentsModel = new CommentsModel(api);
+const userModel = new UserModel(filmsModel);
+
 let stats;
 const changeSiteState = (action) => {
   switch (action) {
@@ -29,17 +35,14 @@ const changeSiteState = (action) => {
     break;
     case SiteState.STATS:
       filmListPresenter.destroy();
-      stats = new Stats(filmsModel.getFilms(), userModel.getRaiting());
+      stats = new Stats(filmsModel.getFilms(), userModel.getRating());
       render(siteMainElement, stats.getElement(), RenderPosition.BEFOREEND);
       break;
   }
 };
 
-const filmsModel = new FilmsModel();
-const filterModel = new FilterModel();
-const userModel = new UserModel(filmsModel);
 
-const filmListPresenter = new FilmListPresenter(siteMainElement, filmsModel, filterModel);
+const filmListPresenter = new FilmListPresenter(siteMainElement, filmsModel, filterModel, commentsModel, api);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel, changeSiteState);
 
 render(siteHeaderElement, new UserRatingView().getElement(), RenderPosition.BEFOREEND);
@@ -47,11 +50,10 @@ render(siteHeaderElement, new UserRatingView().getElement(), RenderPosition.BEFO
 filterPresenter.init();
 filmListPresenter.init();
 
-render(filmCountElement, new FilmCountView().getElement(), RenderPosition.BEFOREEND);
-
 api.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
+    render(filmCountElement, new FilmCountView().getElement(), RenderPosition.BEFOREEND);
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);

@@ -1,44 +1,44 @@
-import Observer from '../utils/observer.js';
-import {UserRaiting} from "../const";
+import Observer from "../utils/observer.js";
+import {UserRating} from "../const";
 
 export default class UserModel extends Observer {
   constructor(filmsModel) {
     super();
     this._filmsModel = filmsModel;
-    this._userRaiting = UserRaiting.MOVIE_BUFF;
+    this._userRating = UserRating.MOVIE_BUFF;
     this._observers = {
-      updateRaiting: []
+      updateRating: []
     };
 
-    this.updateRaiting = this.updateRaiting.bind(this);
+    this.updateRating = this.updateRating.bind(this);
   }
 
-  getRaiting() {
-    return this._userRaiting;
+  getRating() {
+    return this._userRating;
   }
 
-  updateRaiting() {
+  updateRating() {
     const watchedFilms = this._getWatchedFilmsNumber(this._filmsModel.getFilms());
-    const userRaiting = this._getUserRaiting(watchedFilms);
+    const userRating = this._getUserRating(watchedFilms);
 
-    if (this._userRaiting === userRaiting) {
+    if (this._userRating === userRating) {
       return;
     }
 
-    this._userRaiting = userRaiting;
+    this._userRating = userRating;
   }
 
   _getWatchedFilmsNumber(films) {
     return films.reduce((acc, currentFilm) => acc + currentFilm.isInHistory, 0);
   }
 
-  _getUserRaiting(watchedFilms) {
+  _getUserRating(watchedFilms) {
     if (watchedFilms > 20) {
-      return UserRaiting.MOVIE_BUFF;
+      return UserRating.MOVIE_BUFF;
     } else if (watchedFilms > 10 && watchedFilms <= 20) {
-      return UserRaiting.FAN;
+      return UserRating.FAN;
     } else if (watchedFilms > 0 && watchedFilms <= 10) {
-      return UserRaiting.NOVICE;
+      return UserRating.NOVICE;
     } else {
       return null;
     }

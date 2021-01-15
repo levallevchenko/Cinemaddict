@@ -1,8 +1,8 @@
-import {StatsPeriod} from '../const';
-import Smart from './smart.js';
+import {StatsPeriod} from "../const";
+import Smart from "./smart.js";
 import dayjs from "dayjs";
 import Chart from "chart.js";
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 const renderChart = (statisticCtx) => {
   const sortedGeners = [...genres].sort((previous, current) => current[1] - previous[1]);
@@ -124,7 +124,7 @@ const createStats = (state) => {
   <p class="statistic__rank">
     Your rank
     <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-    <span class="statistic__rank-label">${state.userRaiting}</span>
+    <span class="statistic__rank-label">${state.userRating}</span>
   </p>
 
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -169,11 +169,11 @@ const createStats = (state) => {
 };
 
 export default class Stats extends Smart {
-  constructor(films, userRaiting) {
+  constructor(films, userRating) {
     super();
     this._state = {
       films,
-      userRaiting,
+      userRating,
       period: StatsPeriod.ALL
     };
     this._chart = null;

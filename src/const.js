@@ -41,7 +41,7 @@ export const SiteState = {
   STATS: `STATS`
 };
 
-export const UserRaiting = {
+export const UserRating = {
   NOVICE: `novice`,
   FAN: `fan`,
   MOVIE_BUFF: `movie buff`

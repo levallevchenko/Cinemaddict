@@ -1,14 +1,11 @@
 
 import FilmsModel from "./model/films.js";
+import CommentsModel from "./model/comments.js";
 
 const Method = {
   GET: `GET`,
-  PUT: `PUT`
-};
-
-const SuccessHTTPStatusRange = {
-  MIN: 200,
-  MAX: 299
+  PUT: `PUT`,
+  DELETE: `DELETE`
 };
 
 export default class Api {
@@ -35,12 +32,36 @@ export default class Api {
 
   }
 
+  getComments(filmId) {
+    return this._load({url: `comments/${filmId}`})
+      .then(Api.toJSON)
+      .then((comments) => comments.map(CommentsModel.adaptToClient));
+  }
+
+  addComment(comment, filmId) {
+    return this._load({
+      url: `comments/${filmId}`,
+      method: Method.POST,
+      body: JSON.stringify(CommentsModel.adaptCommentToServer(comment)),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then(Api._toJSON)
+      .then((response) => response.comments.map(CommentsModel.adaptToClient));
+  }
+
+  deleteComment(filmId) {
+    return this._load({
+      url: `comments/${filmId}`,
+      method: Method.DELETE
+    });
+  }
+
   _load({
     url,
     method = Method.GET,
     body = null,
     headers = new Headers()
-  }) {
+   }) {
     headers.append(`Authorization`, this._authorization);
 
     return fetch(
@@ -52,14 +73,12 @@ export default class Api {
   }
 
   static checkStatus(response) {
-    if (
-      response.status < SuccessHTTPStatusRange.MIN ||
-      response.status >= SuccessHTTPStatusRange.MAX
-    ) {
-      throw new Error(`${response.status}: ${response.statusText}`);
+    if (response.ok) {
+      return response;
     }
 
-    return response;
+    const {statusText, status} = response;
+    throw new Error(`${status} — ${statusText}`);
   }
 
   static toJSON(response) {

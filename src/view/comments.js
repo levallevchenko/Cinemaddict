@@ -1,20 +1,25 @@
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import {EMOJIS} from "../const.js";
-import SmartView from "./smart.js";
 import {generateTemplate} from "../utils/render.js";
+import SmartView from "./smart.js";
 
 const createCommentTemplate = (commentElement) => {
-  const {emoji, comment, commentDate, author} = commentElement;
+  const {emoji, text, date, author} = commentElement;
+
+  dayjs.extend(relativeTime);
+  const formatDate = dayjs(date).format(`YYYY-MM-DD`);
+  const dateFromNow = dayjs(`${formatDate}`).fromNow();
 
   return `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
       <img src="./images/emoji/${emoji}.png" width="55" height="55" alt="emoji-smile">
     </span>
     <div>
-      <p class="film-details__comment-text">${comment}</p>
+      <p class="film-details__comment-text">${text}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
-        <span class="film-details__comment-day">${commentDate}</span>
+        <span class="film-details__comment-day">${dateFromNow}</span>
         <button class="film-details__comment-delete">Delete</button>
       </p>
     </div>
@@ -29,15 +34,13 @@ const createEmojiTemplate = (emoji) => {
 };
 
 
-const createCommentsListTemplate = (state) => {
-  const {comments, commentText} = state;
-
+const createCommentsListTemplate = (comments, text) => {
   const commentTemplate = generateTemplate(comments, createCommentTemplate);
   const emojiTemplate = generateTemplate(EMOJIS, createEmojiTemplate);
 
-  const renderComment = (comment) => {
-    const text = comment ? `${commentText}` : ``;
-    return text;
+  const renderComment = (commentText) => {
+    const userText = commentText ? `${commentText}` : ``;
+    return userText;
   };
 
   return `<div class="film-details__bottom-container">
@@ -54,7 +57,7 @@ const createCommentsListTemplate = (state) => {
           </div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value=${commentText}>${renderComment(commentText)}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value="${text}">${renderComment(text)}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -66,9 +69,11 @@ const createCommentsListTemplate = (state) => {
 };
 
 export default class Comments extends SmartView {
-  constructor(film) {
+  constructor(comments) {
     super();
-    this._state = film;
+    this._state = comments;
+    this._emoji = null;
+    this._text = null;
 
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
@@ -77,7 +82,7 @@ export default class Comments extends SmartView {
   }
 
   _getTemplate() {
-    return createCommentsListTemplate(this._state);
+    return createCommentsListTemplate(this._state, this._text);
   }
 
   restoreHandlers() {
@@ -86,12 +91,13 @@ export default class Comments extends SmartView {
 
   _createCommentEmoji(evt) {
     const emojiName = evt.target.value.split(` `, 1);
+    this._emoji = emojiName.toString();
     const commentEmoji = `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="${emojiName}" value="${emojiName}"></img>`;
 
     return commentEmoji;
   }
 
-  _chooseEmoji(evt) {
+  chooseEmoji(evt) {
     const emojiContainer = document.querySelector(`.film-details__add-emoji-label`);
 
     const emoji = this._createCommentEmoji(evt);
@@ -101,21 +107,13 @@ export default class Comments extends SmartView {
   _emojiClickHandler(evt) {
     if (evt.target.classList.contains(`film-details__emoji-item`)) {
       evt.preventDefault();
-      this.updateData({
-        commentEmoji: evt.target.value.split(``)[0]
-      });
-
-      if (this._state.commentEmoji) {
-        this._chooseEmoji(evt);
-      }
+      this.chooseEmoji(evt);
     }
   }
 
   _commentInputHandler(evt) {
     evt.preventDefault();
-    this.updateData({
-      commentText: evt.target.value
-    }, true);
+    this._text = evt.target.value;
   }
 
   _setInnerHandlers() {
@@ -129,25 +127,23 @@ export default class Comments extends SmartView {
   }
 
   _commentToggleHandler(evt) {
-    this._commentEmoji = this._state.commentEmoji ? this._state.commentEmoji : ``;
-    this._commentText = this._state.commentText ? this._state.commentText : ``;
-
     if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
-      if (this._commentText === `` && this._commentEmoji === ``) {
+      this._emoji = this._emoji ? this._emoji : ``;
+      this._text = this._text ? this._text : ``;
+      if (this._emoji === `` && this._text === ``) {
         return;
       }
 
+      // Видимо обработчики на обновление нужно будет переносить во вьюху попапа, а логику в презентер коммента?
+
       const newComment = {
-        comment: this._commentText,
-        emoji: this._commentEmoji,
-        commentDate: dayjs().fromNow(),
-        author: this._state.comments[0].author
+        emoji: this._emoji,
+        comment: this._text,
       };
-      delete this._state.commentText;
-      delete this._state.commentEmoji;
-      document.removeEventListener(`keydown`, this._messageToggleHandler);
+
+      document.removeEventListener(`keydown`, this._commentToggleHandler);
       this.updateData({
-        comments: [...this._state.comments, newComment]
+        comments: [...this._state, newComment],
       });
     }
   }

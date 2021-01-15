@@ -17,10 +17,12 @@ const FILM_COUNT_PER_STEP = 5;
 const FILM_EXTRA_COUNT = 2;
 
 export default class FilmList {
-  constructor(filmListContainer, filmsModel, filterModel) {
+  constructor(filmListContainer, filmsModel, filterModel, commentsModel, api) {
+    this._filmListContainer = filmListContainer;
     this._filmsModel = filmsModel;
     this._filterModel = filterModel;
-    this._filmListContainer = filmListContainer;
+    this._commentsModel = commentsModel;
+    this._api = api;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
 
     this._loadingComponent = new LoadingView();
@@ -51,12 +53,14 @@ export default class FilmList {
     this._closeFilmDetails = this._closeFilmDetails.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
+    this._renderComments = this._renderComments.bind(this);
 
     this._renderFilmCard = this._renderFilmCard.bind(this);
     this._renderExtraFilmCard = this._renderExtraFilmCard.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    // this._commentsModel.addObserver(this._handleModelEvent);
 
     this._filmsList = this._filmListComponent.getElement().querySelector(`.films-list`); // список
     this._filmsContainer = this._filmListComponent.getElement().querySelector(`.films-list__container`); // карточки
@@ -100,13 +104,19 @@ export default class FilmList {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
+        this._api.updateFilm(update).then((response) => {
+          this._filmsModel.updateFilm(updateType, response);
+        });
         break;
       case UserAction.ADD_COMMENT:
-        this._filmsModel.addComment(updateType, update);
+        this._api.addComment(update, update.id).then((response) => {
+          this._commentsModel.addComment(updateType, response);
+        });
         break;
       case UserAction.DELETE_COMMENT:
-        this._filmsModel.deleteComment(updateType, update);
+        this._api.deleteComment(update.id).then(() => {
+          this._commentsModel.deleteComment(updateType, update);
+        });
         break;
     }
   }
@@ -138,7 +148,6 @@ export default class FilmList {
   }
 
   _handleFilmChange(updatedFilm) {
-    // Здесь будем вызывать обновление модели
     this._films = this._filmsModel.updateFilm(this._films, updatedFilm);
     this._reRenderFilmCard(updatedFilm, this._cardComponent);
     this._renderExtraFilmCard(updatedFilm, this._cardTopRatedComponent, this._topRatedContainer);
@@ -226,6 +235,16 @@ export default class FilmList {
     escPressHandler(evt, this._closeFilmDetails);
   }
 
+  _renderComments(film) {
+    this._api.getComments(film.id)
+    .then((comments) => {
+      this._commentsComponent = new CommentsView(comments);
+      render(this._filmDetailsComponent, this._commentsComponent, RenderPosition.BEFOREEND);
+    })
+
+    .catch(() => this._commentsModel.setComments([]));
+  }
+
   _renderFilmDetails(film) {
     if (this._filmDetailsComponent) {
       remove(this._filmDetailsComponent);
@@ -234,7 +253,6 @@ export default class FilmList {
     this._filmDetailsId = film.id;
 
     this._filmDetailsComponent = new FilmDetailsView(film);
-    this._commentsComponent = new CommentsView(film);
 
     document.addEventListener(`keydown`, this._escKeyDownHandler);
 
@@ -244,11 +262,13 @@ export default class FilmList {
     this._filmDetailsComponent.setFavoriteChangeHandler(() => this._handleFavoriteClick(film));
 
     render(this._filmListContainer, this._filmDetailsComponent, RenderPosition.BEFOREEND);
-    render(this._filmDetailsComponent, this._commentsComponent, RenderPosition.BEFOREEND);
+    this._renderComments(film);
   }
 
   _handleWatchlistClick(film) {
-    this._handleFilmChange(
+    this._handleViewAction(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             film,
@@ -260,7 +280,9 @@ export default class FilmList {
   }
 
   _handleWatchedClick(film) {
-    this._handleFilmChange(
+    this._handleViewAction(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             film,
@@ -272,7 +294,9 @@ export default class FilmList {
   }
 
   _handleFavoriteClick(film) {
-    this._handleFilmChange(
+    this._handleViewAction(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             film,
@@ -311,6 +335,10 @@ export default class FilmList {
   }
 
   _renderExtraFilms() {
+    const filmCount = this._getFilms().length;
+    if (filmCount === 0) {
+      return;
+    }
     const topRatedFilms = this._getFilms().slice().sort(sortByRating);
     const mostCommentedFilms = this._getFilms().slice().sort(sortByComments);
 
