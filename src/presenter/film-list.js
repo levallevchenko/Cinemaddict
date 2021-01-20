@@ -149,7 +149,6 @@ export default class FilmList {
   }
 
   _handleFilmChange(updatedFilm) {
-    // this._films = this._filmsModel.updateFilm(this._films, updatedFilm);
     this._reRenderFilmCard(updatedFilm, this._cardComponent);
 
     this._renderExtraFilmCard(updatedFilm, this._cardTopRatedComponent, this._topRatedContainer);
@@ -268,11 +267,14 @@ export default class FilmList {
 
     this._filmDetailsId = film.id;
 
-    this._filmDetailsComponent = new FilmDetailsView(film);
+    this._renderComments(film);
+
+    this._commentsCount = this._userCommentComponent.size;
+
+    this._filmDetailsComponent = new FilmDetailsView(film, this._commentsCount);
     this._commentsContainer = this._filmDetailsComponent.getElement().querySelector(`.film-details__comments-list`);
 
     render(this._filmListContainer, this._filmDetailsComponent, RenderPosition.BEFOREEND);
-    this._renderComments(film);
 
     this._filmDetailsComponent.setCloseButtonClickHandler(() => this._closeFilmDetails());
     this._filmDetailsComponent.setWatchlistChangeHandler(() => this._handleWatchlistClick(film));

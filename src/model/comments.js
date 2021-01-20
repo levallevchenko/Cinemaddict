@@ -9,8 +9,10 @@ export default class CommentsModel extends Observer {
     // this.addObserver(this.deleteComment, this.addComment)
   }
 
-  setComments(comments) {
+  setComments(comments, updateType) {
     this._comments = comments.slice();
+
+    this._notify(updateType);
   }
 
   getComments() {

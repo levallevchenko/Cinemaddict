@@ -15,8 +15,8 @@ const createEmojiTemplate = (emoji) => {
     </label>`;
 };
 
-const createFilmDetailsTemplate = (state) => {
-  const {poster, title, rating, duration, genre, description, originalTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite, comments, commentText} = state;
+const createFilmDetailsTemplate = (state, commentsCount) => {
+  const {poster, title, rating, duration, genre, description, originalTitle, director, writers, actors, releaseDate, country, ageLimit, isWatchlist, isWatched, isFavorite, commentText} = state;
 
   const filmReleaseDate = dayjs(releaseDate).format(`DD MMMM YYYY`);
   const filmGenresTemplate = generateTemplate(genre, createGenresTemplate);
@@ -110,7 +110,7 @@ const createFilmDetailsTemplate = (state) => {
 
         <div class="film-details__bottom-container">
           <section class="film-details__comments-wrap">
-            <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
+            <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${commentsCount}</span></h3>
 
             <ul class="film-details__comments-list"></ul>
 
@@ -135,9 +135,10 @@ const createFilmDetailsTemplate = (state) => {
 };
 
 export default class FilmDetails extends SmartView {
-  constructor(film) {
+  constructor(film, commentsCount) {
     super();
     this._state = this._parseFilmToState(film);
+    this._commentsCount = (commentsCount === 0) ? this._state.comments.length : commentsCount;
     // this._scroll = window.pageYOffset;
 
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
@@ -153,7 +154,7 @@ export default class FilmDetails extends SmartView {
   }
 
   _getTemplate() {
-    return createFilmDetailsTemplate(this._state);
+    return createFilmDetailsTemplate(this._state, this._commentsCount);
   }
 
   _parseFilmToState(film) {
