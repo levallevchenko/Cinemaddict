@@ -65,3 +65,7 @@ export const sortByComments = (filmA, filmB) => {
   return filmB.comments.length - filmA.comments.length;
 };
 
+export const getScroll = () => window.pageYOffset;
+
+export const backToScroll = (scrollValue) => window.scrollTo(0, scrollValue);
+

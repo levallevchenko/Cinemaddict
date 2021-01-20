@@ -6,10 +6,7 @@ export default class CommentsModel extends Observer {
     super();
     this._api = api;
     this._comments = [];
-    this._observers = {
-      deleteComment: [],
-      addComment: []
-    };
+    // this.addObserver(this.deleteComment, this.addComment)
   }
 
   setComments(comments) {
@@ -20,16 +17,16 @@ export default class CommentsModel extends Observer {
     return this._comments;
   }
 
-  deleteComment(deletedComment) {
-    return this._api.deleteComment(deletedComment.id)
+  deleteComment(updateType, update) {
+    return this._api.deleteComment(update.id)
     .then(() => {
-      this._comments = this._comments.filter((comment) => (comment.id !== deletedComment.id));
-      this._notify(UserAction.DELETE_COMMENT, deletedComment);
+      this._comments = this._comments.filter((comment) => (comment.id !== update.id));
+      // this._notify(updateType, update);
     });
   }
 
-  addComment(commentToAdd, filmId) {
-    return this._api.addComment(commentToAdd, filmId)
+  addComment(update, filmId) {
+    return this._api.addComment(update, filmId)
     .then((response) => {
       this._comments = response.comments;
       this._notify(UserAction.ADD_COMMENT, response);

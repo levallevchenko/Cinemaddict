@@ -58,9 +58,8 @@ export default class Films extends Observer {
         }
     );
 
-    delete adaptedFilm.user_details.watchlist;
-    delete adaptedFilm.user_details.already_watched;
-    delete adaptedFilm.user_details.favorite;
+    delete adaptedFilm.user_details;
+    delete adaptedFilm.film_info;
 
     return adaptedFilm;
   }

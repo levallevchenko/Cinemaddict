@@ -5,6 +5,7 @@ import CommentsModel from "./model/comments.js";
 const Method = {
   GET: `GET`,
   PUT: `PUT`,
+  POST: `POST`,
   DELETE: `DELETE`
 };
 
@@ -42,16 +43,21 @@ export default class Api {
     return this._load({
       url: `comments/${filmId}`,
       method: Method.POST,
-      body: JSON.stringify(CommentsModel.adaptCommentToServer(comment)),
+      body: JSON.stringify(CommentsModel.adaptToServer(comment)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api._toJSON)
-      .then((response) => response.comments.map(CommentsModel.adaptToClient));
+    .then(Api.toJSON)
+    .then((response) => {
+      return {
+        comments: response.comments.map(CommentsModel.adaptToClient),
+        movie: FilmsModel.adaptToClient(response.movie)
+      };
+    });
   }
 
-  deleteComment(filmId) {
+  deleteComment(commentId) {
     return this._load({
-      url: `comments/${filmId}`,
+      url: `comments/${commentId}`,
       method: Method.DELETE
     });
   }

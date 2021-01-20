@@ -46,3 +46,8 @@ export const UserRating = {
   FAN: `fan`,
   MOVIE_BUFF: `movie buff`
 };
+
+export const DeleteButtonState = {
+  REGULAR: `Delete`,
+  DISABLED: `Deleting...`
+};

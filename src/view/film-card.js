@@ -8,7 +8,7 @@ const createFilmCardTemplate = (film) => {
   const {poster, title, rating, releaseDate, duration, genre, description, comments, isWatchlist, isWatched, isFavorite} = film;
 
   const releaseYear = dayjs(releaseDate).format(`YYYY`);
-  const shortDescription = description.toString().length > MAX_DESCRIPTION_LENGTH ? `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)} …` : description;
+  const shortDescription = description.length > MAX_DESCRIPTION_LENGTH ? `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1)} …` : description;
 
   const filmGenre = genre[0];
 
