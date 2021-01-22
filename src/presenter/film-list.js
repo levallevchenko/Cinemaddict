@@ -257,7 +257,7 @@ export default class FilmList {
         return this._userCommentComponent;
       });
     })
-    .catch(() => this._commentsModel.setComments([]));
+    .catch(() => this._commentsModel.getErrorComment());
   }
 
   _renderFilmDetails(film) {
@@ -273,6 +273,9 @@ export default class FilmList {
 
     this._filmDetailsComponent = new FilmDetailsView(film, this._commentsCount);
     this._commentsContainer = this._filmDetailsComponent.getElement().querySelector(`.film-details__comments-list`);
+
+    const scrollValue = this._filmDetailsComponent.getElement().scrollTop;
+    backToScroll(scrollValue)
 
     render(this._filmListContainer, this._filmDetailsComponent, RenderPosition.BEFOREEND);
 
@@ -328,13 +331,13 @@ export default class FilmList {
   }
 
   _handleCommentSubmit(evt) {
-    const scrollValue = window.pageYOffset;
-    if (evt.key === `Enter`) {
+    // const scrollValue = window.pageYOffset;
+    if (evt.ctrlKey && evt.key === `Enter`) {
       const userComment = this._filmDetailsComponent.getUserCommentData();
-      const {text, emoji, film} = userComment;
       if (userComment === null) {
         return;
       }
+      const {text, emoji, film} = userComment;
       this._handleViewAction(
           UserAction.ADD_COMMENT,
           UpdateType.PATCH,
@@ -352,7 +355,7 @@ export default class FilmList {
       this._userCommentComponent.forEach((component) => remove(component));
       this._userCommentComponent = new Map();
       this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, film);
-      backToScroll(scrollValue);
+      // backToScroll(scrollValue);
     }
   }
 

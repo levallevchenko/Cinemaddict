@@ -151,6 +151,7 @@ export default class FilmDetails extends SmartView {
 
     this._commentsCountContainerElement = this.getElement().querySelector(`.film-details__comments-title`);
     this._commentsCountElement = this._commentsCountContainerElement.querySelector(`.film-details__comments-count`);
+    this._emojiContainer = this.getElement().querySelector(`.film-details__add-emoji-label`);
   }
 
   _getTemplate() {
@@ -235,14 +236,12 @@ export default class FilmDetails extends SmartView {
   _createCommentEmoji(evt) {
     const emojiName = evt.target.value.split(` `, 1);
     this._emoji = emojiName.toString();
-    const commentEmoji = `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="${emojiName}" value="${emojiName}"></img>`;
+    this._commentEmoji = `<img src="images/emoji/${emojiName}.png" width="55" height="55" alt="${emojiName}" value="${emojiName}"></img>`;
 
-    return commentEmoji;
+    return this._commentEmoji;
   }
 
   chooseEmoji(evt) {
-    this._emojiContainer = document.querySelector(`.film-details__add-emoji-label`);
-
     const emoji = this._createCommentEmoji(evt);
     this._emojiContainer.innerHTML = emoji;
   }
@@ -278,7 +277,11 @@ export default class FilmDetails extends SmartView {
   }
 
   getUserCommentData() {
-    if (!this._state.commentText && !this._state.commentEmoji) {
+    if (!this._state.commentText || !this._state.commentEmoji) {
+      this._emojiContainer.classList.add(`film-details__comment-required`);
+      this._textarea.classList.add(`film-details__comment-required`);
+      this._textarea.value = ``;
+      this._textarea.placeholder = `You forgot to select an emoji or write a comment`
       return null;
     }
     return {
@@ -295,12 +298,13 @@ export default class FilmDetails extends SmartView {
     this._getScroll();
   }
 
+
   getScroll() {
     this._scroll = window.pageYOffset;
     return this._scroll;
   }
 
-  backToScroll() {
-    this.getElement().scroll(0, this._scroll);
+  backToScroll(scroll) {
+    this.getElement().scroll(0, scroll);
   }
 }
