@@ -16,9 +16,9 @@ const createFilterItemTemplate = (filters, currentFilterType) => {
     `<nav class="main-navigation">
       <div class="main-navigation__items">
         <a href="#all" data-filter-type="${FilterType.ALL}" class="main-navigation__item ${isAllFilter}">All movies</a>
-        <a href="#watchlist" data-filter-type="${FilterType.WATCHLIST}" class="main-navigation__item ${isWatchlistFilter}">Watchlist <span class="main-navigation__item-count">${WATCHLIST.count}</span></a>
-        <a href="#history" data-filter-type="${FilterType.WATCHED}" class="main-navigation__item ${isWatchedFilter}">History <span class="main-navigation__item-count">${WATCHED.count}</span></a>
-        <a href="#favorites" data-filter-type="${FilterType.FAVORITES}" class="main-navigation__item ${isFavoriteFilter}">Favorites <span class="main-navigation__item-count">${FAVORITES.count}</span></a>
+        <a href="#watchlist" data-filter-type="${FilterType.WATCHLIST}" class="main-navigation__item ${isWatchlistFilter}">Watchlist <span class="main-navigation__item-count" data-filter-type="${FilterType.WATCHLIST}">${WATCHLIST.count}</span></a>
+        <a href="#history" data-filter-type="${FilterType.WATCHED}" class="main-navigation__item ${isWatchedFilter}">History <span class="main-navigation__item-count" data-filter-type="${FilterType.WATCHED}">${WATCHED.count}</span></a>
+        <a href="#favorites" data-filter-type="${FilterType.FAVORITES}" class="main-navigation__item ${isFavoriteFilter}">Favorites <span class="main-navigation__item-count" data-filter-type="${FilterType.FAVORITES}">${FAVORITES.count}</span></a>
       </div>
       <a href="#stats" class="main-navigation__additional">Stats</a>
     </nav>`
@@ -40,7 +40,7 @@ export default class Filter extends AbstractView {
   }
 
   _filterTypeChangeHandler(evt) {
-    if (evt.target.tagName !== `A`) {
+    if (evt.target.tagName !== `A` && evt.target.tagName !== `SPAN`) {
       return;
     }
     evt.preventDefault();

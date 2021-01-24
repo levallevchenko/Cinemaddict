@@ -66,12 +66,12 @@ export default class FilmList {
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
     this._commentsModel.addObserver(this._handleModelEvent);
-
-    this._filmsList = this._filmListComponent.getElement().querySelector(`.films-list`); // список
-    this._filmsContainer = this._filmListComponent.getElement().querySelector(`.films-list__container`); // карточки
   }
 
   init() {
+    this._filmsList = this._filmListComponent.getElement().querySelector(`.films-list`); // список
+    this._filmsContainer = this._filmListComponent.getElement().querySelector(`.films-list__container`); // карточки
+
     render(this._filmListContainer, this._filmListComponent, RenderPosition.BEFOREEND);
 
     if (this._isLoading) {
@@ -101,8 +101,6 @@ export default class FilmList {
 
   destroy() {
     this._clearFilmList({resetRenderedFilms: true, resetSort: true});
-    remove(this._topRatedFilmsComponent);
-    remove(this._mostCommentedFilmsComponent);
     remove(this._filmListComponent);
   }
 

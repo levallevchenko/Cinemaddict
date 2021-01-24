@@ -30,7 +30,7 @@ export default class Filter {
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new FilterView(filters, this._currentFilter);
-    this._filtersButtons = Array.from(this._filterComponent.getElement().querySelectorAll(`.main-navigation__item`));
+    this._filterButtons = Array.from(this._filterComponent.getElement().querySelectorAll(`.main-navigation__item`));
 
     this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
     this._filterComponent.setStatsButtonClickHandler(this._handleStatsButtonClick);
@@ -49,14 +49,13 @@ export default class Filter {
   }
 
   _handleFilterTypeChange(filterType) {
-    if (this._currentFilter === filterType) {
+    if (this._currentFilter === filterType && this._isFilmListShowing) {
       return;
     }
 
     if (!this._isFilmListShowing) {
       this._isFilmListShowing = true;
       this._changeSiteState(SiteState.FILMS);
-      return;
     }
 
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
@@ -66,7 +65,7 @@ export default class Filter {
     if (!this._isFilmListShowing) {
       return;
     }
-    this._filtersButtons.forEach((filterButton) => {
+    this._filterButtons.forEach((filterButton) => {
       filterButton.classList.remove(`main-navigation__item--active`);
     });
 
@@ -93,7 +92,7 @@ export default class Filter {
       },
       {
         type: FilterType.FAVORITES,
-        name: `Favorites`,
+        name: `favorites`,
         count: filter[FilterType.FAVORITES](films).length
       }
     ];
