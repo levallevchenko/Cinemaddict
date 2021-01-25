@@ -83,13 +83,14 @@ export default class FilmList {
     this._renderExtraFilms();
   }
 
-  _getFilms(sortType) {
+  _getFilms() {
     const filterType = this._filterModel.getFilter();
     const films = this._filmsModel.getFilms();
     const filteredFilms = filter[filterType](films);
+    this._filteredFilmsCount = filteredFilms.length;
     const currentFilteredFilms = filteredFilms.slice();
 
-    switch (this._currentSortType || sortType) {
+    switch (this._currentSortType) {
       case SortType.DATE:
         return currentFilteredFilms.sort(sortByDate);
       case SortType.RATING:
@@ -129,6 +130,7 @@ export default class FilmList {
         break;
       case UpdateType.MINOR:
       // - обновить список (например, при изменении кнопки управления в отфильтрованном списке (возможно здесь MAJOR – сам фильтр и показ кнопки show more тоже изменятся. Но сброс сортировки не нужен (т.к в отфильтрованном всегда default))
+        this._handleFilmChange(updatedFilm);
         this._clearFilmList();
         this._renderFilmList();
         break;
@@ -289,7 +291,7 @@ export default class FilmList {
   _handleWatchlistClick(film) {
     this._handleViewAction(
         UserAction.UPDATE_FILM,
-        UpdateType.PATCH,
+        UpdateType.MINOR,
         Object.assign(
             {},
             film,
@@ -303,7 +305,7 @@ export default class FilmList {
   _handleWatchedClick(film) {
     this._handleViewAction(
         UserAction.UPDATE_FILM,
-        UpdateType.PATCH,
+        UpdateType.MINOR,
         Object.assign(
             {},
             film,
@@ -317,7 +319,7 @@ export default class FilmList {
   _handleFavoriteClick(film) {
     this._handleViewAction(
         UserAction.UPDATE_FILM,
-        UpdateType.PATCH,
+        UpdateType.MINOR,
         Object.assign(
             {},
             film,
@@ -401,12 +403,14 @@ export default class FilmList {
   }
 
   _renderExtraFilms() {
-    const filmCount = this._getFilms().length;
+    const films = this._getFilms().slice();
+    const filmCount = films.length;
+
     if (filmCount === 0) {
       return;
     }
-    const topRatedFilms = this._getFilms().sort(sortByRating).slice(0, FILM_EXTRA_COUNT);
-    const mostCommentedFilms = this._getFilms().sort(sortByComments).slice(0, FILM_EXTRA_COUNT);
+    const topRatedFilms = films.sort(sortByRating).slice(0, FILM_EXTRA_COUNT);
+    const mostCommentedFilms = films.sort(sortByComments).slice(0, FILM_EXTRA_COUNT);
 
     render(this._filmListComponent, this._topRatedFilmsComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._mostCommentedFilmsComponent, RenderPosition.BEFOREEND);
@@ -428,17 +432,17 @@ export default class FilmList {
     const filmCount = this._getFilms().length;
     const films = this._getFilms().slice(0, Math.min(filmCount, this._renderedFilmCount));
 
-    if (filmCount === 0) {
+    if (filmCount === 0 || this._filteredFilmsCount === 0) {
       this._renderNoFilms();
       return;
     }
 
-    this._renderSort();
-    this._renderFilms(films, this._cardComponent, this._filmsContainer);
-
-    if (filmCount > FILM_COUNT_PER_STEP) {
+    if (filmCount > this._renderedFilmCount) {
       this._renderShowMoreButton();
     }
+
+    this._renderSort();
+    this._renderFilms(films, this._cardComponent, this._filmsContainer);
   }
 
   _clearFilmList({resetRenderedFilmCount = false, resetSortType = false} = {}) {
@@ -446,7 +450,6 @@ export default class FilmList {
 
     this._cardComponent.forEach((component) => remove(component));
     this._cardComponent = new Map();
-    this._renderedFilmCount = FILM_COUNT_PER_STEP;
 
     remove(this._sortComponent);
     remove(this._loadingComponent);
@@ -456,7 +459,9 @@ export default class FilmList {
     if (resetRenderedFilmCount) {
       this._renderedFilmCount = FILM_COUNT_PER_STEP;
     } else {
-      this._renderedFilmCount = Math.min(filmCount, this._renderedFilmCount);
+      this._renderedFilmCount = (filmCount === this._filteredFilmsCount)
+        ? this._renderedFilmCount
+        : Math.min(filmCount, this._filteredFilmsCount);
     }
 
     if (resetSortType) {
