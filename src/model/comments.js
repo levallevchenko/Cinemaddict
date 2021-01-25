@@ -1,4 +1,4 @@
-import Observer from "../utils/observer.js";
+import Observer from "./observer.js";
 import {UserAction} from "../const.js";
 
 export default class CommentsModel extends Observer {
@@ -6,7 +6,6 @@ export default class CommentsModel extends Observer {
     super();
     this._api = api;
     this._comments = [];
-    // this.addObserver(this.deleteComment, this.addComment)
   }
 
   setComments(comments, updateType) {

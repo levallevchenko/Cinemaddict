@@ -45,14 +45,14 @@ const changeSiteState = (action) => {
 const filmListPresenter = new FilmListPresenter(siteMainElement, filmsModel, filterModel, commentsModel, api);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel, changeSiteState);
 
-render(siteHeaderElement, new UserRatingView().getElement(), RenderPosition.BEFOREEND);
-
 filterPresenter.init();
 filmListPresenter.init();
 
 api.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
+    const userRating = userModel.updateRating();
+    render(siteHeaderElement, new UserRatingView(userRating).getElement(), RenderPosition.BEFOREEND);
     render(filmCountElement, new FilmCountView().getElement(), RenderPosition.BEFOREEND);
   })
   .catch(() => {

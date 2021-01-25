@@ -1,16 +1,19 @@
-import Observer from "../utils/observer.js";
-import {UserRating} from "../const";
+import Observer from "./observer.js";
+import {UserRating, RatingFilmCount} from "../const";
 
 export default class UserModel extends Observer {
   constructor(filmsModel) {
     super();
     this._filmsModel = filmsModel;
-    this._userRating = UserRating.MOVIE_BUFF;
-    this._observers = {
-      updateRating: []
-    };
+    this._userRating = UserRating.NOVICE;
 
     this.updateRating = this.updateRating.bind(this);
+    this._filmsModel.addObserver(this.updateRating);
+  }
+
+  setRating(updateType, rating) {
+    this._userRating = rating;
+    this._notify(updateType, rating);
   }
 
   getRating() {
@@ -29,18 +32,17 @@ export default class UserModel extends Observer {
   }
 
   _getWatchedFilmsNumber(films) {
-    return films.reduce((acc, currentFilm) => acc + currentFilm.isInHistory, 0);
+    return films.reduce((acc, currentFilm) => acc + currentFilm.isWatched, 0);
   }
 
   _getUserRating(watchedFilms) {
-    if (watchedFilms > 20) {
+    if (watchedFilms > RatingFilmCount.FAN_FILMS_MAX) {
       return UserRating.MOVIE_BUFF;
-    } else if (watchedFilms > 10 && watchedFilms <= 20) {
+    } else if (watchedFilms > RatingFilmCount.NOVICE_FILMS_MAX && watchedFilms <= RatingFilmCount.FAN_FILMS_MAX) {
       return UserRating.FAN;
-    } else if (watchedFilms > 0 && watchedFilms <= 10) {
+    } else if (watchedFilms > 0 && watchedFilms <= RatingFilmCount.NOVICE_FILMS_MAX) {
       return UserRating.NOVICE;
-    } else {
-      return null;
     }
+    return null;
   }
 }

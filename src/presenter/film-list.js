@@ -12,7 +12,6 @@ import CommentView from "../view/comment.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import TopRatedFilmsView from "../view/top-rated-films.js";
 import MostCommentedFilmsView from "../view/most-commented-films.js";
-// import CommentPresenter from "./comment.js"
 
 const FILM_COUNT_PER_STEP = 5;
 const FILM_EXTRA_COUNT = 2;

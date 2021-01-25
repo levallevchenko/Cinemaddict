@@ -47,6 +47,11 @@ export const UserRating = {
   MOVIE_BUFF: `movie buff`
 };
 
+export const RatingFilmCount = {
+  NOVICE_FILMS_MAX: 10,
+  FAN_FILMS_MAX: 20,
+};
+
 export const DeleteButtonState = {
   REGULAR: `Delete`,
   DISABLED: `Deleting...`
