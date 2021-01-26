@@ -22,7 +22,6 @@ export default class CommentsModel extends Observer {
     return this._api.deleteComment(update.id)
     .then(() => {
       this._comments = this._comments.filter((comment) => (comment.id !== update.id));
-      // this._notify(updateType, update);
     });
   }
 
@@ -36,10 +35,10 @@ export default class CommentsModel extends Observer {
 
   getErrorComment() {
     const errorComment = {
-      id: `!!!`,
-      author: `site`,
+      id: `x`,
+      author: `Cinemaddict`,
       date: new Date(),
-      emotion: `angry`,
+      emoji: `angry`,
       text: `Не удалось загрузить комментарии.`
     };
     this._comments = [errorComment];

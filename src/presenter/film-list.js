@@ -114,7 +114,9 @@ export default class FilmList {
         break;
       case UserAction.ADD_COMMENT:
         this._commentsModel.addComment(update, film.id)
-        .catch(() => this._filmDetailsComponent.userCommentErrorHandler());
+        .catch(() => {
+          this._filmDetailsComponent.userCommentErrorHandler();
+        });
         break;
       case UserAction.DELETE_COMMENT:
         this._commentsModel.deleteComment(updateType, update);
@@ -258,7 +260,10 @@ export default class FilmList {
         return this._userCommentComponent;
       });
     })
-    .catch(() => this._commentsModel.getErrorComment());
+    .catch(() => {
+      this._commentComponent = new CommentView(this._commentsModel.getErrorComment());
+      render(this._commentsContainer, this._commentComponent, RenderPosition.BEFOREEND);
+    });
   }
 
   _renderFilmDetails(film) {
@@ -388,8 +393,11 @@ export default class FilmList {
   }
 
   _updateMostCommentedBlock() {
-    remove(this._mostCommentedFilmsComponent);
-    render(this._filmListComponent, this._mostCommentedFilmsComponent, RenderPosition.BEFOREEND);
+    const films = this._getFilms().slice();
+    this._cardMostCommentedComponent.forEach((component) => remove(component));
+    this._cardMostCommentedComponent = new Map();
+    this._mostCommentedFilms.length = 0;
+    this._mostCommentedFilms = films.sort(sortByComments).slice(0, FILM_EXTRA_COUNT);
     this._renderFilms(this._mostCommentedFilms, this._cardMostCommentedComponent, this._mostCommentedContainer, this._renderExtraFilmCard);
   }
 
