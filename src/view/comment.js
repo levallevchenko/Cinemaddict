@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import he from "he";
 import relativeTime from "dayjs/plugin/relativeTime";
 import {DeleteButtonState} from "../const.js";
 import AbstractView from "./abstract.js";
@@ -15,7 +16,7 @@ const createCommentTemplate = (commentElement) => {
       <img src="./images/emoji/${emoji}.png" width="55" height="55" alt="emoji-smile">
     </span>
     <div>
-      <p class="film-details__comment-text">${text}</p>
+      <p class="film-details__comment-text">${he.encode(text)}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${author}</span>
         <span class="film-details__comment-day">${dateFromNow}</span>

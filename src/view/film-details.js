@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import he from "he";
 import {EMOJIS} from "../const.js";
 import {generateTemplate} from "../utils/render.js";
 import {checkActiveElement, getFormatTime} from "../utils/project.js";
@@ -122,7 +123,7 @@ const createFilmDetailsTemplate = (state, commentsCount) => {
               </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value="">${userComment}</textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value="">${he.encode(userComment)}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
