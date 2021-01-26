@@ -1,4 +1,4 @@
-import {escPressHandler, sortByDate, sortByRating, sortByComments, backToScroll} from "../utils/project.js";
+import {escPressHandler, sortByDate, sortByRating, sortByComments} from "../utils/project.js";
 import {render, RenderPosition, remove, replace} from "../utils/render.js";
 import {filter} from "../utils/filter.js";
 import {SortType, UserAction, UpdateType} from "../const.js";
@@ -56,6 +56,7 @@ export default class FilmList {
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._closeFilmDetails = this._closeFilmDetails.bind(this);
+    this._updateMostCommentedBlock = this._updateMostCommentedBlock.bind(this);
 
     this._renderFilmCard = this._renderFilmCard.bind(this);
     this._renderExtraFilmCard = this._renderExtraFilmCard.bind(this);
@@ -112,7 +113,8 @@ export default class FilmList {
         });
         break;
       case UserAction.ADD_COMMENT:
-        this._commentsModel.addComment(update, film.id);
+        this._commentsModel.addComment(update, film.id)
+        .catch(() => this._filmDetailsComponent.userCommentErrorHandler());
         break;
       case UserAction.DELETE_COMMENT:
         this._commentsModel.deleteComment(updateType, update);
@@ -184,7 +186,7 @@ export default class FilmList {
   }
 
   _renderNoFilms() {
-    render(this._filmListContainer, this._noFilmsComponent, RenderPosition.BEFOREEND);
+    render(this._filmsContainer, this._noFilmsComponent, RenderPosition.BEFOREEND);
   }
 
   _createFilmCard(film) {
@@ -273,9 +275,6 @@ export default class FilmList {
     this._filmDetailsComponent = new FilmDetailsView(film, this._commentsCount);
     this._commentsContainer = this._filmDetailsComponent.getElement().querySelector(`.film-details__comments-list`);
 
-    const scrollValue = this._filmDetailsComponent.getElement().scrollTop;
-    backToScroll(scrollValue)
-
     render(this._filmListContainer, this._filmDetailsComponent, RenderPosition.BEFOREEND);
 
     this._filmDetailsComponent.setCloseButtonClickHandler(() => this._closeFilmDetails());
@@ -330,7 +329,6 @@ export default class FilmList {
   }
 
   _handleCommentSubmit(evt) {
-    // const scrollValue = window.pageYOffset;
     if (evt.ctrlKey && evt.key === `Enter`) {
       const userComment = this._filmDetailsComponent.getUserCommentData();
       if (userComment === null) {
@@ -351,10 +349,11 @@ export default class FilmList {
               }),
           film
       );
+      this._filmDetailsComponent.disableCommentInputs();
       this._userCommentComponent.forEach((component) => remove(component));
       this._userCommentComponent = new Map();
       this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, film);
-      // backToScroll(scrollValue);
+      this._updateMostCommentedBlock();
     }
   }
 
@@ -372,6 +371,7 @@ export default class FilmList {
               comments: film.comments.filter((filmComment) => (filmComment !== comment.id))
             }
         ));
+    this._updateMostCommentedBlock();
   }
 
   _handleShowMoreButtonClick() {
@@ -385,6 +385,12 @@ export default class FilmList {
     if (this._renderedFilmCount >= filmCount) {
       remove(this._showMoreButtonComponent);
     }
+  }
+
+  _updateMostCommentedBlock() {
+    remove(this._mostCommentedFilmsComponent);
+    render(this._filmListComponent, this._mostCommentedFilmsComponent, RenderPosition.BEFOREEND);
+    this._renderFilms(this._mostCommentedFilms, this._cardMostCommentedComponent, this._mostCommentedContainer, this._renderExtraFilmCard);
   }
 
   _renderShowMoreButton() {
@@ -408,8 +414,8 @@ export default class FilmList {
     if (filmCount === 0) {
       return;
     }
-    const topRatedFilms = films.sort(sortByRating).slice(0, FILM_EXTRA_COUNT);
-    const mostCommentedFilms = films.sort(sortByComments).slice(0, FILM_EXTRA_COUNT);
+    this._topRatedFilms = films.sort(sortByRating).slice(0, FILM_EXTRA_COUNT);
+    this._mostCommentedFilms = films.sort(sortByComments).slice(0, FILM_EXTRA_COUNT);
 
     render(this._filmListComponent, this._topRatedFilmsComponent, RenderPosition.BEFOREEND);
     render(this._filmListComponent, this._mostCommentedFilmsComponent, RenderPosition.BEFOREEND);
@@ -418,8 +424,8 @@ export default class FilmList {
     this._topRatedContainer = this._extraContainers[0];
     this._mostCommentedContainer = this._extraContainers[1];
 
-    this._renderFilms(topRatedFilms, this._cardTopRatedComponent, this._topRatedContainer, this._renderExtraFilmCard);
-    this._renderFilms(mostCommentedFilms, this._cardMostCommentedComponent, this._mostCommentedContainer, this._renderExtraFilmCard);
+    this._renderFilms(this._topRatedFilms, this._cardTopRatedComponent, this._topRatedContainer, this._renderExtraFilmCard);
+    this._renderFilms(this._mostCommentedFilms, this._cardMostCommentedComponent, this._mostCommentedContainer, this._renderExtraFilmCard);
   }
 
   _renderFilmList() {

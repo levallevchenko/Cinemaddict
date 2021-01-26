@@ -4,6 +4,8 @@ import {generateTemplate} from "../utils/render.js";
 import {checkActiveElement, getFormatTime} from "../utils/project.js";
 import SmartView from "./smart.js";
 
+const SHAKE_DURATION = 500;
+
 const createGenresTemplate = (genre) => {
   return `<span class="film-details__genre">${genre}</span>`;
 };
@@ -139,7 +141,8 @@ export default class FilmDetails extends SmartView {
     super();
     this._state = this._parseFilmToState(film);
     this._commentsCount = (commentsCount === 0) ? this._state.comments.length : commentsCount;
-    // this._scroll = window.pageYOffset;
+
+    this._isCommentFormDisabled = false;
 
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
     this._watchlistToggleHandler = this._watchlistToggleHandler.bind(this);
@@ -152,6 +155,9 @@ export default class FilmDetails extends SmartView {
     this._commentsCountContainerElement = this.getElement().querySelector(`.film-details__comments-title`);
     this._commentsCountElement = this._commentsCountContainerElement.querySelector(`.film-details__comments-count`);
     this._emojiContainer = this.getElement().querySelector(`.film-details__add-emoji-label`);
+    this._emojiList = this.getElement().querySelector(`.film-details__emoji-list`);
+    this._textarea = this.getElement().querySelector(`.film-details__comment-input`);
+    this._newComment = this.getElement().querySelector(`.film-details__new-comment`);
   }
 
   _getTemplate() {
@@ -267,13 +273,13 @@ export default class FilmDetails extends SmartView {
   }
 
   _setInnerHandlers() {
-    this._textarea = this.getElement()
-    .querySelector(`.film-details__comment-input`);
-
     this.getElement()
         .querySelector(`.film-details__emoji-list`)
         .addEventListener(`click`, this._emojiClickHandler);
-    this._textarea.addEventListener(`input`, this._commentInputHandler);
+
+    this.getElement()
+      .querySelector(`.film-details__comment-input`)
+      .addEventListener(`input`, this._commentInputHandler);
   }
 
   getUserCommentData() {
@@ -281,7 +287,7 @@ export default class FilmDetails extends SmartView {
       this._emojiContainer.classList.add(`film-details__comment-required`);
       this._textarea.classList.add(`film-details__comment-required`);
       this._textarea.value = ``;
-      this._textarea.placeholder = `You forgot to select an emoji or write a comment`
+      this._textarea.placeholder = `You forgot to select an emoji or write a comment`;
       return null;
     }
     return {
@@ -291,11 +297,23 @@ export default class FilmDetails extends SmartView {
     };
   }
 
+  userCommentErrorHandler() {
+    this._newComment.style.animation = `shake ${SHAKE_DURATION / 1000}s`;
+    setTimeout(() => {
+      this._newComment.style.animation = ``;
+    }, SHAKE_DURATION);
+  }
+
   clearInput() {
     this._emojiContainer.innerHTML = ``;
     this._textarea.value = ``;
     this._textarea.focus();
     this._getScroll();
+  }
+
+  disableCommentInputs() {
+    this._textarea.disabled = !this._isCommentFormDisabled;
+    this._emojiList.style.pointerEvents = `none`;
   }
 
 
