@@ -53,7 +53,7 @@ api.getFilms()
     filmsModel.setFilms(UpdateType.INIT, films);
     const userRating = userModel.updateRating();
     render(siteHeaderElement, new UserRatingView(userRating).getElement(), RenderPosition.BEFOREEND);
-    render(filmCountElement, new FilmCountView().getElement(), RenderPosition.BEFOREEND);
+    render(filmCountElement, new FilmCountView(films.length).getElement(), RenderPosition.BEFOREEND);
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);
