@@ -329,7 +329,7 @@ export default class FilmList {
   }
 
   _handleCommentSubmit(evt) {
-    if (evt.ctrlKey && evt.key === `Enter`) {
+    if ((evt.ctrlKey || evt.metaKey)  && evt.key === `Enter`) {
       const userComment = this._filmDetailsComponent.getUserCommentData();
       if (userComment === null) {
         return;
