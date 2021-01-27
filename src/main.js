@@ -1,8 +1,8 @@
 import {SiteState, UpdateType} from './const';
 import {render, RenderPosition, remove} from "./utils/render.js";
-import UserRatingView from "./view/user-rating.js";
 import FilmCountView from "./view/film-count.js";
-import Stats from './view/statistics';
+import StatsView from './view/statistics';
+import UserPresenter from './presenter/user.js';
 import FilmListPresenter from "./presenter/film-list.js";
 import FilterPresenter from "./presenter/filter.js";
 import FilmsModel from "./model/films.js";
@@ -35,14 +35,14 @@ const changeSiteState = (action) => {
     break;
     case SiteState.STATS:
       filmListPresenter.destroy();
-      stats = new Stats(filmsModel.getFilms(), userModel.getRating());
+      stats = new StatsView(filmsModel.getFilms(), userModel.getRating());
       render(siteMainElement, stats.getElement(), RenderPosition.BEFOREEND);
       break;
   }
 };
 
-
-const filmListPresenter = new FilmListPresenter(siteMainElement, filmsModel, filterModel, commentsModel, api);
+const userPresenter = new UserPresenter(userModel);
+const filmListPresenter = new FilmListPresenter(siteMainElement, filmsModel, filterModel, commentsModel, userModel, api);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel, changeSiteState);
 
 filterPresenter.init();
@@ -51,9 +51,8 @@ filmListPresenter.init();
 api.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
-    const userRating = userModel.updateRating();
-    render(siteHeaderElement, new UserRatingView(userRating).getElement(), RenderPosition.BEFOREEND);
-    render(filmCountElement, new FilmCountView(films.length).getElement(), RenderPosition.BEFOREEND);
+    userPresenter.init();
+    render(filmCountElement, new FilmCountView(films.length), RenderPosition.BEFOREEND);
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);

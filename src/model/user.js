@@ -21,7 +21,7 @@ export default class UserModel extends Observer {
   }
 
   updateRating() {
-    const watchedFilms = this._getWatchedFilmsNumber(this._filmsModel.getFilms());
+    const watchedFilms = this.getWatchedFilmsNumber(this._filmsModel.getFilms());
     const userRating = this._getUserRating(watchedFilms);
 
     if (this._userRating === userRating) {
@@ -31,7 +31,7 @@ export default class UserModel extends Observer {
     this._userRating = userRating;
   }
 
-  _getWatchedFilmsNumber(films) {
+  getWatchedFilmsNumber(films) {
     return films.reduce((acc, currentFilm) => acc + currentFilm.isWatched, 0);
   }
 

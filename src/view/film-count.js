@@ -1,4 +1,3 @@
-import {getRandomInteger} from "../utils/common.js";
 import AbstractView from "./abstract.js";
 
 const createFilmCountTemplate = (filmsCount) => {

@@ -12,16 +12,18 @@ import CommentView from "../view/comment.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import TopRatedFilmsView from "../view/top-rated-films.js";
 import MostCommentedFilmsView from "../view/most-commented-films.js";
+import UserPresenter from './user.js';
 
 const FILM_COUNT_PER_STEP = 5;
 const FILM_EXTRA_COUNT = 2;
 
 export default class FilmList {
-  constructor(filmListContainer, filmsModel, filterModel, commentsModel, api) {
+  constructor(filmListContainer, filmsModel, filterModel, commentsModel, userModel, api) {
     this._filmListContainer = filmListContainer;
     this._filmsModel = filmsModel;
     this._filterModel = filterModel;
     this._commentsModel = commentsModel;
+    this._userModel = userModel;
     this._api = api;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
 
@@ -30,6 +32,7 @@ export default class FilmList {
     this._filmListComponent = new FilmListView();
     this._topRatedFilmsComponent = new TopRatedFilmsView();
     this._mostCommentedFilmsComponent = new MostCommentedFilmsView();
+    this._userPresenter = new UserPresenter(this._userModel);
 
     this._cardComponent = new Map();
     this._cardTopRatedComponent = new Map();
@@ -71,7 +74,6 @@ export default class FilmList {
   init() {
     this._filmsList = this._filmListComponent.getElement().querySelector(`.films-list`); // список
     this._filmsContainer = this._filmListComponent.getElement().querySelector(`.films-list__container`); // карточки
-
     render(this._filmListContainer, this._filmListComponent, RenderPosition.BEFOREEND);
 
     if (this._isLoading) {
@@ -134,6 +136,7 @@ export default class FilmList {
       case UpdateType.MINOR:
       // - обновить список (например, при изменении кнопки управления в отфильтрованном списке (возможно здесь MAJOR – сам фильтр и показ кнопки show more тоже изменятся. Но сброс сортировки не нужен (т.к в отфильтрованном всегда default))
         this._handleFilmChange(updatedFilm);
+        this._userPresenter.init();
         this._clearFilmList();
         this._renderFilmList();
         break;
@@ -334,7 +337,7 @@ export default class FilmList {
   }
 
   _handleCommentSubmit(evt) {
-    if ((evt.ctrlKey || evt.metaKey)  && evt.key === `Enter`) {
+    if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
       const userComment = this._filmDetailsComponent.getUserCommentData();
       if (userComment === null) {
         return;
