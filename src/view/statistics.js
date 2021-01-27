@@ -120,12 +120,19 @@ const createStats = (state) => {
     return (state.period === statsPeriod) ? ` checked` : ``;
   };
 
+  const setRank = (userRating) => {
+    const rank = userRating === null
+      ? ``
+      : `<p class="statistic__rank">
+        Your rank
+        <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
+        <span class="statistic__rank-label">${userRating}</span>
+        </p>`
+    return rank;
+  };
+
   return `<section class="statistic">
-  <p class="statistic__rank">
-    Your rank
-    <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-    <span class="statistic__rank-label">${state.userRating}</span>
-  </p>
+    ${setRank(state.userRating)}
 
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
     <p class="statistic__filters-description">Show stats:</p>
