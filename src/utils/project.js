@@ -1,8 +1,10 @@
 import dayjs from "dayjs";
 
+const minuteInHour = 60;
+
 export const getFormatTime = (time) => {
-  const hours = `${Math.floor(time / 60)}h`;
-  const minutes = `${time % 60}m`;
+  const hours = `${Math.floor(time / minuteInHour)}h`;
+  const minutes = `${time % minuteInHour}m`;
   const formatTime = hours.slice(0, 1) === `0` ? `${minutes}` : `${hours} ${minutes}`;
 
   return formatTime;
