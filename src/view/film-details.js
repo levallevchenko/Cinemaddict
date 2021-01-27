@@ -6,6 +6,7 @@ import {checkActiveElement, getFormatTime} from "../utils/project.js";
 import SmartView from "./smart.js";
 
 const SHAKE_DURATION = 500;
+const DURATION_DIVIDER = 1000;
 
 const createGenresTemplate = (genre) => {
   return `<span class="film-details__genre">${genre}</span>`;
@@ -299,7 +300,7 @@ export default class FilmDetails extends SmartView {
   }
 
   userCommentErrorHandler() {
-    this._newComment.style.animation = `shake ${SHAKE_DURATION / 1000}s`;
+    this._newComment.style.animation = `shake ${SHAKE_DURATION / DURATION_DIVIDER}s`;
     setTimeout(() => {
       this._newComment.style.animation = ``;
     }, SHAKE_DURATION);
