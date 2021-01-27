@@ -42,7 +42,7 @@ const changeSiteState = (action) => {
 };
 
 const userPresenter = new UserPresenter(userModel);
-const filmListPresenter = new FilmListPresenter(siteMainElement, filmsModel, filterModel, commentsModel, userModel, api);
+const filmListPresenter = new FilmListPresenter(siteMainElement, filmsModel, filterModel, commentsModel, userPresenter, api);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel, changeSiteState);
 
 filterPresenter.init();

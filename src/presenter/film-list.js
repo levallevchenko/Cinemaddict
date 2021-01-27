@@ -12,18 +12,16 @@ import CommentView from "../view/comment.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import TopRatedFilmsView from "../view/top-rated-films.js";
 import MostCommentedFilmsView from "../view/most-commented-films.js";
-import UserPresenter from './user.js';
 
 const FILM_COUNT_PER_STEP = 5;
 const FILM_EXTRA_COUNT = 2;
 
 export default class FilmList {
-  constructor(filmListContainer, filmsModel, filterModel, commentsModel, userModel, api) {
+  constructor(filmListContainer, filmsModel, filterModel, commentsModel, userPresenter, api) {
     this._filmListContainer = filmListContainer;
     this._filmsModel = filmsModel;
     this._filterModel = filterModel;
     this._commentsModel = commentsModel;
-    this._userModel = userModel;
     this._api = api;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
 
@@ -32,7 +30,7 @@ export default class FilmList {
     this._filmListComponent = new FilmListView();
     this._topRatedFilmsComponent = new TopRatedFilmsView();
     this._mostCommentedFilmsComponent = new MostCommentedFilmsView();
-    this._userPresenter = new UserPresenter(this._userModel);
+    this._userPresenter = userPresenter;
 
     this._cardComponent = new Map();
     this._cardTopRatedComponent = new Map();
@@ -116,9 +114,7 @@ export default class FilmList {
         break;
       case UserAction.ADD_COMMENT:
         this._commentsModel.addComment(update, film.id)
-        .catch(() => {
-          this._filmDetailsComponent.userCommentErrorHandler();
-        });
+        .catch(() => this._handleCommentSubmitError());
         break;
       case UserAction.DELETE_COMMENT:
         this._commentsModel.deleteComment(updateType, update);
@@ -365,10 +361,17 @@ export default class FilmList {
     }
   }
 
+  _handleCommentSubmitError() {
+    this._filmDetailsComponent.disableCommentInputs();
+    this._filmDetailsComponent.userCommentErrorHandler();
+  }
+
+
   _handleCommentDelete(comment, film) {
     this._commentComponent.changeDeleteButtonState();
     this._handleViewAction(UserAction.DELETE_COMMENT, UpdateType.PATCH, comment);
     this._userCommentComponent.delete(comment.id);
+    this._updateMostCommentedBlock();
     this._handleViewAction(
         UserAction.UPDATE_FILM,
         UpdateType.PATCH,
@@ -379,7 +382,6 @@ export default class FilmList {
               comments: film.comments.filter((filmComment) => (filmComment !== comment.id))
             }
         ));
-    this._updateMostCommentedBlock();
   }
 
   _handleShowMoreButtonClick() {
