@@ -1,8 +1,10 @@
 import dayjs from "dayjs";
 
-export const getFormatTime = (seconds) => {
-  const hours = `${Math.floor(seconds / 3600)}h`;
-  const minutes = `${Math.floor(seconds / 60) % 60}m`;
+const minuteInHour = 60;
+
+export const getFormatTime = (time) => {
+  const hours = `${Math.floor(time / minuteInHour)}h`;
+  const minutes = `${time % minuteInHour}m`;
   const formatTime = hours.slice(0, 1) === `0` ? `${minutes}` : `${hours} ${minutes}`;
 
   return formatTime;
@@ -54,4 +56,18 @@ export const sortByRating = (filmA, filmB) => {
 
   return filmB.rating - filmA.rating;
 };
+
+export const sortByComments = (filmA, filmB) => {
+  const weight = getWeightForNoDataFilm(filmA.comments.length, filmB.comments.length);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return filmB.comments.length - filmA.comments.length;
+};
+
+export const getScroll = () => window.pageYOffset;
+
+export const backToScroll = (scrollValue) => window.scrollTo(0, scrollValue);
 

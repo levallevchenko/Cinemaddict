@@ -1,38 +1,40 @@
 import AbstractView from "./abstract.js";
 import {SortType} from "../const.js";
+import {checkActiveElement} from "../utils/project.js";
 
-const createFilmsSortTemplate = () => {
+const createFilmsSortTemplate = (currentSortType) => {
+  const checkedClass = `sort__button--active`;
+
+  const isSortByDefault = checkActiveElement(currentSortType === SortType.DEFAULT, checkedClass);
+  const isSortByDate = checkActiveElement(currentSortType === SortType.DATE, checkedClass);
+  const isSortByRating = checkActiveElement(currentSortType === SortType.RATING, checkedClass);
+
   return (
     `<ul class="sort">
-      <li><a href="#" class="sort__button sort__button--active" data-sort-type="${SortType.DEFAULT}">Sort by default</a></li>
-      <li><a href="#" class="sort__button" data-sort-type="${SortType.DATE}">Sort by date</a></li>
-      <li><a href="#" class="sort__button" data-sort-type="${SortType.RATING}">Sort by rating</a></li>
+      <li><a href="#" class="sort__button ${isSortByDefault}" data-sort-type="${SortType.DEFAULT}">Sort by default</a></li>
+      <li><a href="#" class="sort__button ${isSortByDate}" data-sort-type="${SortType.DATE}">Sort by date</a></li>
+      <li><a href="#" class="sort__button ${isSortByRating}" data-sort-type="${SortType.RATING}">Sort by rating</a></li>
     </ul>`
   );
 };
 
 export default class Sort extends AbstractView {
-  constructor() {
+  constructor(currentSortType) {
     super();
-
+    this._currentSortType = currentSortType;
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
   }
 
   _getTemplate() {
-    return createFilmsSortTemplate();
+    return createFilmsSortTemplate(this._currentSortType);
   }
 
   _sortTypeChangeHandler(evt) {
-    const sortButtons = this.getElement().querySelectorAll(`.sort__button`);
-
     if (evt.target.tagName !== `A`) {
       return;
     }
 
     evt.preventDefault();
-    sortButtons.forEach((button) => button.classList.remove(`sort__button--active`));
-    evt.target.classList.add(`sort__button--active`);
-
     this._callback.sortTypeChange(evt.target.dataset.sortType);
   }
 
