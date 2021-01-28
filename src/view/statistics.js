@@ -96,7 +96,7 @@ const createStats = (state) => {
   });
 
   const getTopGenre = () => {
-    let topGenre = {
+    const topGenre = {
       genre: ``,
       watched: 0
     };
