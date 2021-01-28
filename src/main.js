@@ -17,7 +17,6 @@ const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict/`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
 const filmCountElement = document.querySelector(`.footer__statistics`);
 
@@ -30,9 +29,9 @@ let stats;
 const changeSiteState = (action) => {
   switch (action) {
     case SiteState.FILMS:
-    remove(stats);
-    filmListPresenter.init();
-    break;
+      remove(stats);
+      filmListPresenter.init();
+      break;
     case SiteState.STATS:
       filmListPresenter.destroy();
       stats = new StatsView(filmsModel.getFilms(), userModel.getRating());

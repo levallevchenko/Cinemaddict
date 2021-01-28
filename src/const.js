@@ -14,7 +14,7 @@ export const UserAction = {
   DELETE_COMMENT: `DELETE_COMMENT`
 };
 
- export const UpdateType = {
+export const UpdateType = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
   MAJOR: `MAJOR`,
