@@ -401,7 +401,8 @@ export default class FilmList {
     const films = this._getFilms().slice();
     this._cardMostCommentedComponent.forEach((component) => remove(component));
     this._cardMostCommentedComponent = new Map();
-    this._mostCommentedFilms.length = 0;
+    // Возможно поможет с обновлением
+    // this._mostCommentedFilms.length = 0;
     this._mostCommentedFilms = films.sort(sortByComments).slice(0, FILM_EXTRA_COUNT);
     this._renderFilms(this._mostCommentedFilms, this._cardMostCommentedComponent, this._mostCommentedContainer, this._renderExtraFilmCard);
   }
