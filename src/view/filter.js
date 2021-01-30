@@ -30,7 +30,7 @@ export default class Filter extends AbstractView {
     super();
     this._filters = filters;
     this._currentFilter = currentFilterType;
-
+    this._filterButtons = this.getElement().querySelectorAll(`.main-navigation__item`);
     this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
     this._statsButtonClickHandler = this._statsButtonClickHandler.bind(this);
   }
@@ -48,6 +48,10 @@ export default class Filter extends AbstractView {
   }
 
   _statsButtonClickHandler(evt) {
+    evt.target.classList.add(`main-navigation__additional--active`);
+    this._filterButtons.forEach((filterButton) => {
+      filterButton.classList.remove(`main-navigation__item--active`);
+    });
     evt.preventDefault();
     this._callback.siteStateChange(evt);
   }
