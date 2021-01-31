@@ -117,7 +117,8 @@ export default class FilmList {
         .catch(() => this._handleCommentSubmitError());
         break;
       case UserAction.DELETE_COMMENT:
-        this._commentsModel.deleteComment(updateType, update);
+        this._commentsModel.deleteComment(updateType, update)
+        .catch(() => this._handleCommentDeleteError(update));
         break;
     }
   }
@@ -368,8 +369,8 @@ export default class FilmList {
 
 
   _handleCommentDelete(comment, film) {
-    const commentComponent = this._userCommentComponent.get(comment.id);
-    commentComponent.changeDeleteButtonState();
+    this._commentComponent = this._userCommentComponent.get(comment.id);
+    this._commentComponent.changeDeleteButtonState();
     this._handleViewAction(UserAction.DELETE_COMMENT, UpdateType.PATCH, comment);
     this._userCommentComponent.delete(comment.id);
     this._updateMostCommentedBlock();
@@ -383,6 +384,11 @@ export default class FilmList {
               comments: film.comments.filter((filmComment) => (filmComment !== comment.id))
             }
         ));
+  }
+
+  _handleCommentDeleteError(comment) {
+    this._userCommentComponent.set(comment.id, this._commentComponent);
+    this._commentComponent.changeDeleteButtonState();
   }
 
   _handleShowMoreButtonClick() {
