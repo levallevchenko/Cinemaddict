@@ -1,5 +1,4 @@
 import Observer from "./observer.js";
-import {UserAction} from "../const.js";
 
 export default class CommentsModel extends Observer {
   constructor(api) {

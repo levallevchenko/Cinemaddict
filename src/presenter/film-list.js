@@ -113,7 +113,7 @@ export default class FilmList {
         });
         break;
       case UserAction.ADD_COMMENT:
-      this._api.addComment(update, film.id)
+        this._api.addComment(update, film.id)
         .then((response) => {
           this._filmDetailsComponent.disableCommentInputs();
           this._commentsModel.addComment(actionType, response);
