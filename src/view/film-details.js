@@ -284,11 +284,14 @@ export default class FilmDetails extends SmartView {
       .addEventListener(`input`, this._commentInputHandler);
   }
 
+  _getErrorComment() {
+    this._emojiContainer.classList.add(`film-details__comment-required`);
+    this._textarea.classList.add(`film-details__comment-required`);
+  }
+
   getUserCommentData() {
     if (!this._state.commentText || !this._state.commentEmoji) {
-      this._emojiContainer.classList.add(`film-details__comment-required`);
-      this._textarea.classList.add(`film-details__comment-required`);
-      this._textarea.value = ``;
+      this._getErrorComment();
       this._textarea.placeholder = `You forgot to select an emoji or write a comment`;
       return null;
     }
@@ -300,6 +303,7 @@ export default class FilmDetails extends SmartView {
   }
 
   userCommentErrorHandler() {
+    this._getErrorComment();
     this._newComment.style.animation = `shake ${SHAKE_DURATION / DURATION_DIVIDER}s`;
     setTimeout(() => {
       this._newComment.style.animation = ``;
