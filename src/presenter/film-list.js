@@ -250,18 +250,18 @@ export default class FilmList {
     this._api.getComments(film.id)
     .then((comments) => {
       comments.forEach((comment) => {
-        this._commentComponent = new CommentView(comment);
-        render(this._commentsContainer, this._commentComponent, RenderPosition.BEFOREEND);
+        const commentComponent = new CommentView(comment);
+        render(this._commentsContainer, commentComponent, RenderPosition.BEFOREEND);
 
-        this._commentComponent.setDeleteButtonClickHandler(() => this._handleCommentDelete(comment, film));
+        commentComponent.setDeleteButtonClickHandler(() => this._handleCommentDelete(comment, film));
 
-        this._userCommentComponent.set(comment.id, this._commentComponent);
+        this._userCommentComponent.set(comment.id, commentComponent);
         return this._userCommentComponent;
       });
     })
     .catch(() => {
-      this._commentComponent = new CommentView(this._commentsModel.getErrorComment());
-      render(this._commentsContainer, this._commentComponent, RenderPosition.BEFOREEND);
+      const commentComponent = new CommentView(this._commentsModel.getErrorComment());
+      render(this._commentsContainer, commentComponent, RenderPosition.BEFOREEND);
     });
   }
 
@@ -368,7 +368,8 @@ export default class FilmList {
 
 
   _handleCommentDelete(comment, film) {
-    this._commentComponent.changeDeleteButtonState();
+    const commentComponent = this._userCommentComponent.get(comment.id);
+    commentComponent.changeDeleteButtonState();
     this._handleViewAction(UserAction.DELETE_COMMENT, UpdateType.PATCH, comment);
     this._userCommentComponent.delete(comment.id);
     this._updateMostCommentedBlock();
