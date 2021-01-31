@@ -2,6 +2,22 @@ import dayjs from "dayjs";
 
 const minuteInHour = 60;
 
+const getWeightForNoDataFilm = (dataA, dataB) => {
+  if (dataA === null && dataB === null) {
+    return 0;
+  }
+
+  if (dataA === null) {
+    return 1;
+  }
+
+  if (dataB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
 export const getFormatTime = (time) => {
   const hours = `${Math.floor(time / minuteInHour)}h`;
   const minutes = `${time % minuteInHour}m`;
@@ -19,22 +35,6 @@ export const escPressHandler = (evt, action) => {
     evt.preventDefault();
     action();
   }
-};
-
-const getWeightForNoDataFilm = (dataA, dataB) => {
-  if (dataA === null && dataB === null) {
-    return 0;
-  }
-
-  if (dataA === null) {
-    return 1;
-  }
-
-  if (dataB === null) {
-    return -1;
-  }
-
-  return null;
 };
 
 export const sortByDate = (filmA, filmB) => {

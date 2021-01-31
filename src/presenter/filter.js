@@ -30,7 +30,6 @@ export default class Filter {
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new FilterView(filters, this._currentFilter);
-    this._filterButtons = Array.from(this._filterComponent.getElement().querySelectorAll(`.main-navigation__item`));
 
     this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
     this._filterComponent.setStatsButtonClickHandler(this._handleStatsButtonClick);
@@ -65,14 +64,7 @@ export default class Filter {
     if (!this._isFilmListShowing) {
       return;
     }
-    this._filterButtons.forEach((filterButton) => {
-      filterButton.classList.remove(`main-navigation__item--active`);
-    });
-
-    this._filterComponent.getElement().querySelector(`.main-navigation__additional`).classList.add(`main-navigation__additional--active`);
-
     this._isFilmListShowing = false;
-
     this._changeSiteState(SiteState.STATS);
   }
 

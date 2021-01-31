@@ -1,5 +1,4 @@
 import Observer from "./observer.js";
-import {UserAction} from "../const.js";
 
 export default class CommentsModel extends Observer {
   constructor(api) {
@@ -18,19 +17,15 @@ export default class CommentsModel extends Observer {
     return this._comments;
   }
 
-  deleteComment(updateType, update) {
+  deleteComment(update) {
     return this._api.deleteComment(update.id)
     .then(() => {
       this._comments = this._comments.filter((comment) => (comment.id !== update.id));
     });
   }
 
-  addComment(update, filmId) {
-    return this._api.addComment(update, filmId)
-    .then((response) => {
-      this._comments = response.comments;
-      this._notify(UserAction.ADD_COMMENT, response);
-    });
+  addComment(actionType, update) {
+    this._notify(actionType, update);
   }
 
   getErrorComment() {

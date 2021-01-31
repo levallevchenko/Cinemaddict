@@ -113,31 +113,36 @@ export default class FilmList {
         });
         break;
       case UserAction.ADD_COMMENT:
-        this._commentsModel.addComment(update, film.id)
-        .catch(() => this._handleCommentSubmitError());
+        this._api.addComment(update, film.id)
+        .then((response) => {
+          this._filmDetailsComponent.disableCommentInputs();
+          this._commentsModel.addComment(actionType, response);
+          this._userCommentComponent.forEach((component) => remove(component));
+          this._userCommentComponent = new Map();
+          this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, film);
+          this._updateMostCommentedBlock();
+        })
+        .catch(() => this._filmDetailsComponent.userCommentErrorHandler());
         break;
       case UserAction.DELETE_COMMENT:
-        this._commentsModel.deleteComment(updateType, update);
+        this._commentsModel.deleteComment(update)
+        .catch(() => this._handleCommentDeleteError(update));
         break;
     }
   }
 
   _handleModelEvent(updateType, updatedFilm) {
-    // В зависимости от типа изменений решаем, что делать:
     switch (updateType) {
       case UpdateType.PATCH:
-      // - обновить часть списка (например, при изменении кнопки управления)
         this._handleFilmChange(updatedFilm);
         break;
       case UpdateType.MINOR:
-      // - обновить список (например, при изменении кнопки управления в отфильтрованном списке (возможно здесь MAJOR – сам фильтр и показ кнопки show more тоже изменятся. Но сброс сортировки не нужен (т.к в отфильтрованном всегда default))
         this._handleFilmChange(updatedFilm);
         this._userPresenter.init();
         this._clearFilmList();
         this._renderFilmList();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
         this._clearFilmList({resetRenderedFilmCount: true, resetSortType: true});
         this._renderFilmList();
         break;
@@ -250,18 +255,18 @@ export default class FilmList {
     this._api.getComments(film.id)
     .then((comments) => {
       comments.forEach((comment) => {
-        this._commentComponent = new CommentView(comment);
-        render(this._commentsContainer, this._commentComponent, RenderPosition.BEFOREEND);
+        const commentComponent = new CommentView(comment);
+        render(this._commentsContainer, commentComponent, RenderPosition.BEFOREEND);
 
-        this._commentComponent.setDeleteButtonClickHandler(() => this._handleCommentDelete(comment, film));
+        commentComponent.setDeleteButtonClickHandler(() => this._handleCommentDelete(comment, film));
 
-        this._userCommentComponent.set(comment.id, this._commentComponent);
+        this._userCommentComponent.set(comment.id, commentComponent);
         return this._userCommentComponent;
       });
     })
     .catch(() => {
-      this._commentComponent = new CommentView(this._commentsModel.getErrorComment());
-      render(this._commentsContainer, this._commentComponent, RenderPosition.BEFOREEND);
+      const commentComponent = new CommentView(this._commentsModel.getErrorComment());
+      render(this._commentsContainer, commentComponent, RenderPosition.BEFOREEND);
     });
   }
 
@@ -353,21 +358,11 @@ export default class FilmList {
               }),
           film
       );
-      this._filmDetailsComponent.disableCommentInputs();
-      this._userCommentComponent.forEach((component) => remove(component));
-      this._userCommentComponent = new Map();
-      this._handleViewAction(UserAction.UPDATE_FILM, UpdateType.PATCH, film);
-      this._updateMostCommentedBlock();
     }
   }
 
-  _handleCommentSubmitError() {
-    this._filmDetailsComponent.disableCommentInputs();
-    this._filmDetailsComponent.userCommentErrorHandler();
-  }
-
-
   _handleCommentDelete(comment, film) {
+    this._commentComponent = this._userCommentComponent.get(comment.id);
     this._commentComponent.changeDeleteButtonState();
     this._handleViewAction(UserAction.DELETE_COMMENT, UpdateType.PATCH, comment);
     this._userCommentComponent.delete(comment.id);
@@ -382,6 +377,11 @@ export default class FilmList {
               comments: film.comments.filter((filmComment) => (filmComment !== comment.id))
             }
         ));
+  }
+
+  _handleCommentDeleteError(comment) {
+    this._userCommentComponent.set(comment.id, this._commentComponent);
+    this._commentComponent.changeDeleteButtonState();
   }
 
   _handleShowMoreButtonClick() {
@@ -401,7 +401,6 @@ export default class FilmList {
     const films = this._getFilms().slice();
     this._cardMostCommentedComponent.forEach((component) => remove(component));
     this._cardMostCommentedComponent = new Map();
-    this._mostCommentedFilms.length = 0;
     this._mostCommentedFilms = films.sort(sortByComments).slice(0, FILM_EXTRA_COUNT);
     this._renderFilms(this._mostCommentedFilms, this._cardMostCommentedComponent, this._mostCommentedContainer, this._renderExtraFilmCard);
   }
