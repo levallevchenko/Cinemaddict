@@ -1,6 +1,6 @@
 import {SiteState, UpdateType} from './const';
 import {render, RenderPosition, remove} from "./utils/render.js";
-import {isOnline, renderToast} from "./utils/project.js";
+import {renderToast} from "./utils/project.js";
 import FilmCountView from "./view/film-count.js";
 import StatsView from './view/statistics';
 import UserPresenter from './presenter/user.js';
@@ -74,7 +74,7 @@ window.addEventListener(`online`, () => {
   apiWithProvider.sync();
 });
 
- window.addEventListener(`offline`, () => {
+window.addEventListener(`offline`, () => {
   document.title += ` [offline]`;
   renderToast(`Lost connection`);
 });
