@@ -145,6 +145,7 @@ export default class FilmDetails extends SmartView {
     this._commentsCount = (commentsCount === 0) ? this._state.comments.length : commentsCount;
 
     this._isCommentFormDisabled = false;
+    this._isOnline = false;
 
     this._closeButtonClickHandler = this._closeButtonClickHandler.bind(this);
     this._watchlistToggleHandler = this._watchlistToggleHandler.bind(this);
@@ -268,6 +269,15 @@ export default class FilmDetails extends SmartView {
   }
 
   _commentInputHandler(evt) {
+    if (evt.target.value.length && !this._isOnline) {
+      this._isOnline = true;
+      window.addEventListener(`offline`, this.onCommentFormError);
+    }
+    if (evt.target.value.length === 0 && this._isOnline) {
+      this._isOnline = false;
+      window.removeEventListener(`offline`, this.onCommentFormError);
+    }
+
     evt.preventDefault();
     this.updateData({
       commentText: evt.target.value
