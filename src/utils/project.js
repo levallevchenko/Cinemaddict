@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 
-const minuteInHour = 60;
+const MINUTE_IN_HOUR = 60;
+const SHOW_TIME = 4500;
 
 const getWeightForNoDataFilm = (dataA, dataB) => {
   if (dataA === null && dataB === null) {
@@ -19,8 +20,8 @@ const getWeightForNoDataFilm = (dataA, dataB) => {
 };
 
 export const getFormatTime = (time) => {
-  const hours = `${Math.floor(time / minuteInHour)}h`;
-  const minutes = `${time % minuteInHour}m`;
+  const hours = `${Math.floor(time / MINUTE_IN_HOUR)}h`;
+  const minutes = `${time % MINUTE_IN_HOUR}m`;
   const formatTime = hours.slice(0, 1) === `0` ? `${minutes}` : `${hours} ${minutes}`;
 
   return formatTime;
@@ -71,3 +72,18 @@ export const getScroll = () => window.pageYOffset;
 
 export const backToScroll = (scrollValue) => window.scrollTo(0, scrollValue);
 
+export const isOnline = () => {
+  return window.navigator.onLine;
+};
+
+export const renderToast = (message) => {
+  const toast = document.createElement(`div`);
+  toast.textContent = message;
+  toast.classList.add(`toast`);
+
+  document.body.append(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, SHOW_TIME);
+};
