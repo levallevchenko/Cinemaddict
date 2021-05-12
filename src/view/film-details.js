@@ -126,10 +126,10 @@ const createFilmDetailsTemplate = (state, commentsCount) => {
               <label class="film-details__comment-label">
                 <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" value="">${he.encode(userComment)}</textarea>
               </label>
-
               <div class="film-details__emoji-list">
                 ${emojiTemplate}
               </div>
+              <div class="film-details__comment-send-description"><p>Please, press <code>Ctrl/Command + Enter</code> for send comment.</p></div>
             </div>
           </section>
         </div>

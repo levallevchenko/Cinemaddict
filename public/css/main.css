@@ -777,12 +777,12 @@ button {
 }
 .film-details__new-comment {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   padding-bottom: 60px;
-  position: relative;
 }
 .film-details__add-emoji-label {
-  width: 79px;
+  width: 68px;
   height: 68px;
   display: flex;
   justify-content: center;
@@ -901,10 +901,9 @@ button {
   color: #212126;
 }
 .film-details__comment-label {
-  width: 100%;
+  flex-grow: 1;
 }
 .film-details__emoji-list {
-  position: absolute;
   bottom: 5px;
   margin-left: 81px;
 }
@@ -1022,6 +1021,12 @@ button {
 }
 .film-details__user-rating-input:checked + .film-details__user-rating-label {
   background-color: #ffe800;
+}
+
+.film-details__comment-send-description {
+  font-size: 20px;
+  font-weight: 600;
+  color: #f6f6f6;
 }
 
 .statistic {
